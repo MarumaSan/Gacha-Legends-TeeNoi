@@ -20,10 +20,6 @@ run = True
 clock = pygame.time.Clock()
 
 #text
-def effect(src: pygame.Surface, mul=(230,230,230,255)):
-    img = src.copy()
-    img.fill(mul, special_flags=pygame.BLEND_RGBA_MULT)
-    return img
 class TextButton:
     def __init__(self, baseimage, center, on_click=None, scale=2.0, use_mask=True):
         base = pygame.image.load(baseimage).convert_alpha()
@@ -70,6 +66,10 @@ class TextButton:
 def start_game(): print("main")
 def open_settings(): print("settings")
 def quit_game(): pygame.quit(); sys.exit()
+def effect(src: pygame.Surface, mul=(230,230,230,255)):
+    img = src.copy()
+    img.fill(mul, special_flags=pygame.BLEND_RGBA_MULT)
+    return img
 
 #botton
 BASE = "assets/ui/12.png"
