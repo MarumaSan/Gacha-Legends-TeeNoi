@@ -123,30 +123,43 @@ class Button:
         else:
             scaled_rect = self.rect
         
-        # Draw background
-        if not self.image:
+        # Draw background only if not transparent
+        if not self.image and self.bg_color != (0, 0, 0, 0):
             # Draw colored rectangle with smooth color transition
             pygame.draw.rect(screen, current_color, scaled_rect)
             pygame.draw.rect(screen, (255, 255, 255), scaled_rect, 2)  # Border
         
-        # Draw image if provided (centered at top of button)
+        # Draw image if provided
         if self.image:
-            # Calculate image position (top part of button)
-            img_height = int(self.rect.height * 0.75)  # Image takes 75% of button height
-            img_width = self.rect.width - 10
-            
-            if self.scale != 1.0:
-                scaled_img_width = int(img_width * self.scale)
-                scaled_img_height = int(img_height * self.scale)
-                scaled_image = pygame.transform.scale(self.image, (scaled_img_width, scaled_img_height))
-                img_x = scaled_rect.centerx - scaled_img_width // 2
-                img_y = scaled_rect.top + 5
-                screen.blit(scaled_image, (img_x, img_y))
+            # If no text, use full button size for image
+            if not self.text or self.text == "":
+                if self.scale != 1.0:
+                    scaled_img_width = int(self.rect.width * self.scale)
+                    scaled_img_height = int(self.rect.height * self.scale)
+                    scaled_image = pygame.transform.scale(self.image, (scaled_img_width, scaled_img_height))
+                    img_x = scaled_rect.centerx - scaled_img_width // 2
+                    img_y = scaled_rect.centery - scaled_img_height // 2
+                    screen.blit(scaled_image, (img_x, img_y))
+                else:
+                    scaled_image = pygame.transform.scale(self.image, (self.rect.width, self.rect.height))
+                    screen.blit(scaled_image, self.rect.topleft)
             else:
-                scaled_image = pygame.transform.scale(self.image, (img_width, img_height))
-                img_x = self.rect.centerx - img_width // 2
-                img_y = self.rect.top + 5
-                screen.blit(scaled_image, (img_x, img_y))
+                # Has text - image at top, text at bottom
+                img_height = int(self.rect.height * 0.75)
+                img_width = self.rect.width - 10
+                
+                if self.scale != 1.0:
+                    scaled_img_width = int(img_width * self.scale)
+                    scaled_img_height = int(img_height * self.scale)
+                    scaled_image = pygame.transform.scale(self.image, (scaled_img_width, scaled_img_height))
+                    img_x = scaled_rect.centerx - scaled_img_width // 2
+                    img_y = scaled_rect.top + 5
+                    screen.blit(scaled_image, (img_x, img_y))
+                else:
+                    scaled_image = pygame.transform.scale(self.image, (img_width, img_height))
+                    img_x = self.rect.centerx - img_width // 2
+                    img_y = self.rect.top + 5
+                    screen.blit(scaled_image, (img_x, img_y))
         
         # Draw text if provided
         if self.text and (self.text_surface or self.text_surfaces):

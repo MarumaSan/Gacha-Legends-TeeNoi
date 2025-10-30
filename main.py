@@ -1,7 +1,7 @@
 """Hero Gacha Game - จุดเริ่มต้นของเกม"""
 
 from game import Game
-from game.states import LoadingState, MainLobbyState, SettingsState, ProfileState, GachaState, BookState
+from game.states import LoadingState, MainLobbyState, SettingsState, ProfileState, BookState, AddCodeState, MysticChestState, CelestialChestState
 from game.data.player_data import PlayerData
 
 
@@ -27,8 +27,10 @@ def main():
     game.state_manager.add_state('main_lobby', MainLobbyState(game, player_data))
     game.state_manager.add_state('settings', SettingsState(game))
     game.state_manager.add_state('profile', ProfileState(game, player_data))
-    game.state_manager.add_state('gacha', GachaState(game, player_data))
     game.state_manager.add_state('book', BookState(game, player_data))
+    game.state_manager.add_state('add_code', AddCodeState(game))
+    game.state_manager.add_state('mystic_chest', MysticChestState(game, player_data))
+    game.state_manager.add_state('celestial_chest', CelestialChestState(game, player_data))
     
     # เริ่มที่หน้า loading
     game.change_state('loading')

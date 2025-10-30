@@ -11,12 +11,17 @@ class Game:
 
     def __init__(self, width=SCREEN_WIDTH, height=SCREEN_HEIGHT):
         pygame.init()
+        pygame.mixer.init()
         self.screen = pygame.display.set_mode((width, height))
         pygame.display.set_caption(GAME_TITLE)
 
         self.clock = pygame.time.Clock()
         self.running = False
         self.state_manager = StateManager()
+        
+        # ระบบเพลง
+        self.music_loaded = False
+        self._load_music()
 
     def change_state(self, state_name):
         """พฤติกรรมเดิม: เฟดออก -> เปลี่ยน -> เฟดเข้า"""
@@ -33,6 +38,35 @@ class Game:
         if hasattr(self, 'player_data'):
             return self.player_data.save_to_file(filepath)
         return False
+    
+    def _load_music(self):
+        """โหลดและเล่นเพลงพื้นหลัง"""
+        try:
+            # โหลดเพลง bgm.mp3 จาก folder song
+            import os
+            music_path = os.path.join("song", "bgm.mp3")
+            if os.path.exists(music_path):
+                pygame.mixer.music.load(music_path)
+                # ใช้ค่า volume จาก player_data ถ้ามี
+                if hasattr(self, 'player_data'):
+                    volume = self.player_data.settings.get('volume', 50) / 100.0
+                else:
+                    volume = 0.5
+                pygame.mixer.music.set_volume(volume)
+                pygame.mixer.music.play(-1)  # เล่นวนซ้ำ
+                self.music_loaded = True
+                print(f"Music loaded: {music_path}")
+            else:
+                print(f"Music file not found: {music_path}")
+                self.music_loaded = False
+        except Exception as e:
+            print(f"Could not load music: {e}")
+            self.music_loaded = False
+    
+    def set_music_volume(self, volume):
+        """ปรับความดังเพลง (0.0 - 1.0)"""
+        if self.music_loaded:
+            pygame.mixer.music.set_volume(volume)
 
     def run(self):
         self.running = True

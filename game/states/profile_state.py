@@ -10,6 +10,77 @@ from game.data.hero_data import get_hero, get_all_heroes
 from config import SCREEN_WIDTH, SCREEN_HEIGHT, COLOR_GOLD, COLOR_WHITE
 
 
+def _color_effect(src: pygame.Surface, mul=(230, 230, 230, 255)) -> pygame.Surface:
+    img = src.copy()
+    img.fill(mul, special_flags=pygame.BLEND_RGBA_MULT)
+    return img
+
+
+class _ImageButton:
+    def __init__(self, base_img: pygame.Surface, center, on_click=None, scale=1.2, use_mask=True, text="", font=None):
+        if scale != 1.0:
+            w, h = base_img.get_size()
+            base_img = pygame.transform.smoothscale(base_img, (int(w * scale), int(h * scale)))
+
+        self.normal = base_img
+        self.hover = _color_effect(base_img, (230, 240, 245, 255))
+        self.down = _color_effect(base_img, (200, 200, 200, 255))
+
+        self.image = self.normal
+        self.rect = self.image.get_rect(center=center)
+
+        self.on_click = on_click
+        self._held = False
+        self._over = False
+
+        self.use_mask = use_mask
+        self.mask = pygame.mask.from_surface(self.image) if use_mask else None
+
+        self.text = text
+        self.font = font
+        self.text_color = (255, 255, 255)
+
+    def _hit(self, pos):
+        if not self.rect.collidepoint(pos):
+            return False
+        if not self.use_mask:
+            return True
+        lx, ly = pos[0] - self.rect.x, pos[1] - self.rect.y
+        return bool(self.mask.get_at((lx, ly)))
+
+    def handle_event(self, event):
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            if self._hit(event.pos):
+                self._held = True
+        elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+            if self._held and self._hit(event.pos):
+                if self.on_click:
+                    self.on_click()
+            self._held = False
+
+    def update(self, dt):
+        mpos = pygame.mouse.get_pos()
+        self._over = self._hit(mpos)
+
+        if self._over and self._held:
+            self.image = self.down
+        elif self._over:
+            self.image = self.hover
+        else:
+            self.image = self.normal
+
+    def draw(self, surf):
+        shadow = pygame.Surface(self.rect.size, pygame.SRCALPHA)
+        pygame.draw.ellipse(shadow, (0, 0, 0, 60),
+                            (0, int(self.rect.height * 0.75), self.rect.width, int(self.rect.height * 0.5)))
+        surf.blit(shadow, (self.rect.x, self.rect.y))
+        surf.blit(self.image, self.rect)
+
+        if self.text and self.font:
+            label = self.font.render(self.text, True, self.text_color)
+            surf.blit(label, label.get_rect(center=self.rect.center))
+
+
 class ProfileState(GameState):
     """Profile screen showing player stats and owned heroes"""
     
@@ -28,18 +99,10 @@ class ProfileState(GameState):
         self.font_title = None
         self.font_large = None
         self.font_normal = None
+        self.font_small = None
         
         # UI elements
         self.back_button = None
-        self.power_display = None
-        self.rank_display = None
-        self.coin_display = None
-        
-        # Hero grid
-        self.hero_portraits = []
-        self.hero_portrait_rects = []
-        self.heroes_per_row = 5
-        self.heroes_per_page = 15
     
     def enter(self):
         """Called when entering this state - load assets and create UI"""
@@ -53,127 +116,41 @@ class ProfileState(GameState):
             self.background = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
             self.background.fill((40, 30, 20))
         
-        # Load fonts
+        # Load fonts (ใช้ฟอนต์เล็กลง)
         try:
-            self.font_title = self.assets.load_font('assets/fonts/Monocraft.ttf', 48)
-            self.font_large = self.assets.load_font('assets/fonts/Monocraft.ttf', 32)
-            self.font_normal = self.assets.load_font('assets/fonts/Monocraft.ttf', 24)
+            self.font_title = self.assets.load_font('assets/fonts/Monocraft.ttf', 24)
+            self.font_large = self.assets.load_font('assets/fonts/Monocraft.ttf', 18)
+            self.font_normal = self.assets.load_font('assets/fonts/Monocraft.ttf', 16)
+            self.font_small = self.assets.load_font('assets/fonts/Monocraft.ttf', 15)
         except Exception as e:
             print(f"Warning: Could not load font: {e}")
-            self.font_title = pygame.font.Font(None, 48)
-            self.font_large = pygame.font.Font(None, 32)
-            self.font_normal = pygame.font.Font(None, 24)
+            self.font_title = pygame.font.Font(None, 24)
+            self.font_large = pygame.font.Font(None, 18)
+            self.font_normal = pygame.font.Font(None, 16)
+            self.font_small = pygame.font.Font(None, 15)
         
-        # Create stat displays
-        self._create_stat_displays()
+        # โหลดรูปปุ่ม (ใช้รูปเดียวกับหน้าแรก)
+        try:
+            button_img = self.assets.load_image('assets/ui/12.png').convert_alpha()
+        except Exception as e:
+            print(f"Warning: Could not load button image: {e}")
+            button_img = pygame.Surface((220, 70), pygame.SRCALPHA)
+            button_img.fill((60, 60, 90, 255))
+            pygame.draw.rect(button_img, (255, 255, 255, 40), button_img.get_rect(), border_radius=16)
         
-        # Load hero portraits
-        self._load_hero_grid()
-        
-        # Create back button
-        self.back_button = Button(
-            x=SCREEN_WIDTH // 2 - 100,
-            y=SCREEN_HEIGHT - 100,
-            width=200,
-            height=60,
-            text="Return",
-            callback=self.on_back_click,
-            font=self.font_normal,
-            text_color=(255, 255, 255),
-            bg_color=(70, 70, 120),
-            hover_color=(100, 100, 150)
+        # ปุ่ม RETURN TO LOBBY (วางไว้ล่างสุด ขยายขนาดให้ใหญ่ขึ้น)
+        button_center_y = SCREEN_HEIGHT - 60
+        self.back_button = _ImageButton(
+            button_img,
+            center=(SCREEN_WIDTH // 2, button_center_y),
+            on_click=self.on_back_click,
+            scale=1.5,  # ขยายจาก 1.2 เป็น 1.5
+            use_mask=True,
+            text="RETURN TO LOBBY",
+            font=self.font_small
         )
     
-    def _create_stat_displays(self):
-        """Create text displays for player statistics"""
-        # Calculate total power
-        total_power = self._calculate_total_power()
-        
-        # Get rank (placeholder for now)
-        rank = self.player_data.rank if self.player_data.rank > 0 else "Unranked"
-        
-        # Get coin balance
-        coins = self.player_data.get_coin_balance()
-        
-        # Position stats in the upper portion of the screen
-        stats_start_y = 150
-        stats_spacing = 50
-        center_x = SCREEN_WIDTH // 2
-        
-        # Power level display
-        self.power_display = TextDisplay(
-            text=f"Power Level: {total_power}",
-            font=self.font_large,
-            color=COLOR_GOLD,
-            position=(center_x - 150, stats_start_y)
-        )
-        
-        # Rank display
-        self.rank_display = TextDisplay(
-            text=f"Rank: {rank}",
-            font=self.font_normal,
-            color=COLOR_WHITE,
-            position=(center_x - 100, stats_start_y + stats_spacing)
-        )
-        
-        # Coin balance display
-        self.coin_display = TextDisplay(
-            text=f"Coins: {coins}",
-            font=self.font_normal,
-            color=COLOR_GOLD,
-            position=(center_x - 100, stats_start_y + stats_spacing * 2)
-        )
-    
-    def _calculate_total_power(self) -> int:
-        """
-        Calculate total power from all owned heroes
-        
-        Returns:
-            int: Total power level
-        """
-        total_power = 0
-        for hero_id in self.player_data.owned_heroes:
-            hero = get_hero(hero_id)
-            if hero:
-                total_power += hero.power
-        return total_power
-    
-    def _load_hero_grid(self):
-        """Load and position hero portraits in a grid"""
-        self.hero_portraits = []
-        self.hero_portrait_rects = []
-        
-        # Get all owned heroes
-        owned_hero_ids = sorted(list(self.player_data.owned_heroes))
-        
-        if not owned_hero_ids:
-            # No heroes owned yet
-            return
-        
-        # Grid settings
-        portrait_size = 100
-        padding = 20
-        grid_start_x = SCREEN_WIDTH // 2 - (self.heroes_per_row * (portrait_size + padding)) // 2
-        grid_start_y = 320
-        
-        # Load portraits for owned heroes (limit to first page)
-        for i, hero_id in enumerate(owned_hero_ids[:self.heroes_per_page]):
-            hero = get_hero(hero_id)
-            if hero:
-                try:
-                    portrait = self.assets.load_image(hero.portrait_path, (portrait_size, portrait_size))
-                    self.hero_portraits.append((portrait, hero))
-                    
-                    # Calculate grid position
-                    row = i // self.heroes_per_row
-                    col = i % self.heroes_per_row
-                    x = grid_start_x + col * (portrait_size + padding)
-                    y = grid_start_y + row * (portrait_size + padding)
-                    
-                    rect = pygame.Rect(x, y, portrait_size, portrait_size)
-                    self.hero_portrait_rects.append(rect)
-                except Exception as e:
-                    print(f"Warning: Could not load portrait for hero {hero_id}: {e}")
+
     
     def on_back_click(self):
         """Callback for Return button - go back to main lobby"""
@@ -201,15 +178,6 @@ class ProfileState(GameState):
         # Update back button
         if self.back_button:
             self.back_button.update(dt)
-        
-        # Update stat displays with current values
-        if self.power_display:
-            total_power = self._calculate_total_power()
-            self.power_display.set_text(f"Power Level: {total_power}")
-        
-        if self.coin_display:
-            coins = self.player_data.get_coin_balance()
-            self.coin_display.set_text(f"Coins: {coins}")
     
     def draw(self, screen):
         """
@@ -222,40 +190,79 @@ class ProfileState(GameState):
         if self.background:
             screen.blit(self.background, (0, 0))
         
-        # Draw title
+        # คำนวณข้อมูลผู้เล่น
+        total_power = sum(get_hero(hero_id).power for hero_id in self.player_data.owned_heroes if get_hero(hero_id))
+        collected = len(self.player_data.owned_heroes)
+        total_heroes = 21  # จำนวนฮีโร่ทั้งหมด
+        all_gold = self.player_data.get_coin_balance()
+        
+        # ===== หน้าซ้าย - STATISTICS (สถิติผู้เล่น) =====
+        left_x = SCREEN_WIDTH // 4 + 130  # ตำแหน่ง X ของหน้าซ้าย (ขยับขวา 130px)
+        left_start_y = 120  # ตำแหน่ง Y เริ่มต้น (ขยับขึ้น)
+        
+        # หัวข้อ STATISTICS
         if self.font_title:
-            title_surface = self.font_title.render("Profile", True, COLOR_WHITE)
-            title_rect = title_surface.get_rect(center=(SCREEN_WIDTH // 2, 80))
-            screen.blit(title_surface, title_rect)
+            stats_title = self.font_title.render("STATISTICS", True, (0, 0, 0))
+            screen.blit(stats_title, (left_x - stats_title.get_width() // 2, left_start_y))
         
-        # Draw stat displays
-        if self.power_display:
-            self.power_display.draw(screen)
-        if self.rank_display:
-            self.rank_display.draw(screen)
-        if self.coin_display:
-            self.coin_display.draw(screen)
-        
-        # Draw "Owned Heroes" label
+        # แสดง TOTAL POWER (พลังรวมของฮีโร่ทั้งหมด)
         if self.font_normal:
-            label_surface = self.font_normal.render("Owned Heroes", True, COLOR_WHITE)
-            label_rect = label_surface.get_rect(center=(SCREEN_WIDTH // 2, 280))
-            screen.blit(label_surface, label_rect)
-        
-        # Draw hero portraits
-        for (portrait, hero), rect in zip(self.hero_portraits, self.hero_portrait_rects):
-            screen.blit(portrait, rect)
+            power_label = self.font_normal.render("TOTAL POWER", True, (0, 0, 0))
+            screen.blit(power_label, (left_x - power_label.get_width() // 2, left_start_y + 90))
             
-            # Draw border around portrait
-            pygame.draw.rect(screen, COLOR_WHITE, rect, 2)
+            power_value = self.font_large.render(str(total_power), True, (0, 0, 0))
+            screen.blit(power_value, (left_x - power_value.get_width() // 2, left_start_y + 120))
         
-        # Draw "no heroes" message if player has no heroes
-        if not self.hero_portraits and self.font_normal:
-            no_heroes_text = self.font_normal.render("No heroes owned yet", True, (150, 150, 150))
-            no_heroes_rect = no_heroes_text.get_rect(center=(SCREEN_WIDTH // 2, 400))
-            screen.blit(no_heroes_text, no_heroes_rect)
+        # แสดง COLLECTED (จำนวนฮีโร่ที่สะสมได้ / ทั้งหมด)
+        if self.font_normal:
+            collected_label = self.font_normal.render("COLLECTED", True, (0, 0, 0))
+            screen.blit(collected_label, (left_x - collected_label.get_width() // 2, left_start_y + 210))
+            
+            collected_value = self.font_large.render(f"{collected} / {total_heroes}", True, (0, 0, 0))
+            screen.blit(collected_value, (left_x - collected_value.get_width() // 2, left_start_y + 240))
         
-        # Draw back button
+        # แสดง ALL GOLD (จำนวนเหรียญทั้งหมด)
+        if self.font_normal:
+            gold_label = self.font_normal.render("ALL GOLD", True, (0, 0, 0))
+            screen.blit(gold_label, (left_x - gold_label.get_width() // 2, left_start_y + 330))
+            
+            gold_value = self.font_large.render(str(all_gold), True, (0, 0, 0))
+            screen.blit(gold_value, (left_x - gold_value.get_width() // 2, left_start_y + 360))
+        
+        # ===== หน้าขวา - LEADERBOARD (กระดานผู้นำ) =====
+        right_x = SCREEN_WIDTH * 3 // 4 - 130  # ตำแหน่ง X ของหน้าขวา (ขยับซ้าย 130px)
+        right_start_y = 120  # ตำแหน่ง Y เริ่มต้น (ขยับขึ้น)
+        
+        # หัวข้อ LEADERBOARD
+        if self.font_title:
+            leader_title = self.font_title.render("LEADERBOARD", True, (0, 0, 0))
+            screen.blit(leader_title, (right_x - leader_title.get_width() // 2, right_start_y))
+        
+        # หัวตาราง NAME และ POWER
+        if self.font_normal:
+            name_header = self.font_normal.render("NAME", True, (0, 0, 0))
+            power_header = self.font_normal.render("POWER", True, (0, 0, 0))
+            
+            screen.blit(name_header, (right_x - 100, right_start_y + 90))
+            screen.blit(power_header, (right_x + 50, right_start_y + 90))
+        
+        # ข้อมูล Leaderboard (ตัวอย่าง: BABOSS และผู้เล่น)
+        leaderboard_data = [
+            ("BABOSS", 100000),
+            ("ME", total_power)
+        ]
+        
+        # แสดงรายชื่อและพลังในกระดานผู้นำ
+        if self.font_normal:
+            for i, (name, power) in enumerate(leaderboard_data):
+                y_pos = right_start_y + 130 + (i * 40)
+                name_text = self.font_normal.render(name, True, (0, 0, 0))
+                power_text = self.font_normal.render(str(power), True, (0, 0, 0))
+                
+                screen.blit(name_text, (right_x - 100, y_pos))
+                screen.blit(power_text, (right_x + 50, y_pos))
+        
+        # ปุ่ม RETURN TO LOBBY (กลับไปหน้าล็อบบี้)
         if self.back_button:
             self.back_button.draw(screen)
     
