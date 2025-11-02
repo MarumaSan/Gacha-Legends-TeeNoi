@@ -1,8 +1,8 @@
 """Hero Gacha Game - จุดเริ่มต้นของเกม"""
 
-from game import Game
-from game.states import LoadingState, MainLobbyState, SettingsState, ProfileState, BookState, AddCodeState, MysticChestState, CelestialChestState
-from game.data.player_data import PlayerData
+from file_game.code import Game
+from file_game.code.state import LoadingState, MainLobbyState, SettingsState, ProfileState, BookState, AddCodeState, MysticChestState, CelestialChestState
+from file_game.code.data.player_data import PlayerData
 
 
 def main():
@@ -14,7 +14,7 @@ def main():
     player_data = PlayerData()
     
     # พยายามโหลดข้อมูลที่บันทึกไว้
-    save_file = "save_data.json"
+    save_file = "file_game/json/save_data.json"
     if player_data.load_from_file(save_file):
         print(f"โหลดข้อมูลเกมจาก {save_file} สำเร็จ")
     else:
