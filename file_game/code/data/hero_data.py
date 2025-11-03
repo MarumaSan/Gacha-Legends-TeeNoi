@@ -218,7 +218,7 @@ CHARACTER: list[Character] = [
         defense=1000,
         portrait_path='assets/portraits/hero16.png',
         card_front_path='assets/cards/front/hero16.png',
-        card_back_path='assets/cards/back/2.PNG',
+        card_back_path='assets/cards/back/1.PNG',
     ),
     Character(
         id=17,
