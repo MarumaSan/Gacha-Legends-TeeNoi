@@ -1,6 +1,6 @@
 import pygame
 from typing import Callable
-from src.utils.constants import PATH_UI, PATH_FONTS, COLOR_WHITE
+from src.utils.constants import PATH_UI, PATH_FONTS, COLOR_WHITE, COLOR_BLACK, COLOR_PURPLE, COLOR_YELLOW
 
 class Button:
     def __init__(
@@ -8,9 +8,12 @@ class Button:
             x: int,
             y: int,
             image_name: str,
-            text: str,
-            callback: Callable = None,
+            text: str = None,
+            text_color: str = COLOR_WHITE,
+            text_x: int = None,
+            text_y: int = None,
             font_size: int = 32,
+            callback: Callable = None,
             enable: bool = True
     ):
 
@@ -20,9 +23,19 @@ class Button:
         self.text = text
         self.callback = callback
 
-        self.font = pygame.font.Font(PATH_FONTS + 'Monocraft.ttf', font_size)
-        self.color = COLOR_WHITE
-
+        if self.text:
+            self.font = pygame.font.Font(PATH_FONTS + 'Monocraft.ttf', font_size)
+            self.color = text_color
+            self.textSurface = self.font.render(self.text, True, self.color)
+            if text_x and text_y:
+                self.textRect = self.textSurface.get_rect(centerx = text_x, centery = text_y)
+            elif text_x:
+                self.textRect = self.textSurface.get_rect(centerx = text_x, centery=self.imageRect.centery)
+            elif text_y:
+                self.textRect = self.textSurface.get_rect(centerx=self.imageRect.centerx, centery = text_y)
+            else :
+                self.textRect = self.textSurface.get_rect(center=self.imageRect.center)
+                
         self.enable = enable
 
     def handleEvent(self, event: pygame.event.Event) -> None:
@@ -35,9 +48,8 @@ class Button:
         if self.enable:
             screen.blit(self.image, self.imageRect)
 
-            textSurface = self.font.render(self.text, True, self.color)
-            textRect = textSurface.get_rect(center=self.imageRect.center)
-            screen.blit(textSurface, textRect)
+            if self.text:
+                screen.blit(self.textSurface, self.textRect)
 
     def setEnable(self, enable: bool):
         self.enable = enable

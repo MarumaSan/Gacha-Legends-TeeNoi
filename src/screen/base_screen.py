@@ -2,6 +2,9 @@ import pygame
 from src.utils.constants import SCREEN_WIDTH, SCREEN_HEIGHT, PATH_BACKGROUNDS
 
 class BaseScreen:
+    def __init__(self, manager):
+        self.manager = manager
+
     def handleEvents(self, events: list[pygame.event.Event]) -> None:
         pass
     

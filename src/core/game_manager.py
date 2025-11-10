@@ -16,7 +16,7 @@ class GameManager:
         
         self.running = False
 
-        self.currentScreen = LobbyScreen()
+        self.currentScreen = LobbyScreen(self)
 
     def run(self):
         self.running = True
@@ -31,9 +31,7 @@ class GameManager:
             self.clock.tick(FPS)
     
     def render(self) -> None:
-        currentScreen = self.currentScreen
-        if currentScreen:
-            currentScreen.render(self.screen)
+        self.currentScreen.render(self.screen)
     
     def handleEvents(self) -> None:
         events = pygame.event.get()
@@ -43,3 +41,6 @@ class GameManager:
                 self.running = False
         
         self.currentScreen.handleEvents(events)
+    
+    def changeScreen(self, new_screen):
+        self.currentScreen = new_screen
