@@ -4,6 +4,9 @@ SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 720
 FPS = 60
 
+COLOR_WHITE = (255, 255, 255)
+COLOR_BLACK = (0, 0, 0)
+
 PATH_BACKGROUNDS = 'assets/backgrounds/'
 PATH_CARDS = 'assets/cards/'
 PATH_FONTS = 'assets/fonts/'

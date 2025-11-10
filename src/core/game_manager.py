@@ -22,12 +22,8 @@ class GameManager:
         self.running = True
         
         while self.running:
-            events = pygame.event.get()
-        
-            for event in events:
-                if event.type == pygame.QUIT:
-                    self.running = False
-            
+            self.handleEvents()
+
             self.render()
 
             pygame.display.flip()
@@ -38,3 +34,12 @@ class GameManager:
         currentScreen = self.currentScreen
         if currentScreen:
             currentScreen.render(self.screen)
+    
+    def handleEvents(self) -> None:
+        events = pygame.event.get()
+        
+        for event in events:
+            if event.type == pygame.QUIT:
+                self.running = False
+        
+        self.currentScreen.handleEvents(events)
