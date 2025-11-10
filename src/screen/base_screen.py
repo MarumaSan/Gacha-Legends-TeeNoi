@@ -1,5 +1,5 @@
 import pygame
-from src.utils.constants import SCREEN_WIDTH, SCREEN_HEIGHT
+from src.utils.constants import SCREEN_WIDTH, SCREEN_HEIGHT, PATH_BACKGROUNDS
 
 class BaseScreen:
     def handleEvents(self, events: list[pygame.event.Event]) -> None:
@@ -14,7 +14,7 @@ class BaseScreen:
     def update(self) -> None:
         pass
 
-    def setBackground(self, background_path: str) -> None:
-        self.background_path = background_path
-        self.background = pygame.image.load(background_path).convert()
+    def setBackground(self, background_name: str) -> None:
+        self.background_path = PATH_BACKGROUNDS + background_name
+        self.background = pygame.image.load(self.background_path).convert()
         self.background = pygame.transform.scale(self.background, (SCREEN_WIDTH, SCREEN_HEIGHT))

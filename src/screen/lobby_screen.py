@@ -1,11 +1,11 @@
 import pygame
 from src.screen.base_screen import BaseScreen
-from src.utils.constants import PATH_BACKGROUNDS
 from src.ui.button import Button
+from src.ui.text_display import TextDisplay
 
 class LobbyScreen(BaseScreen):
     def __init__(self):
-        self.setBackground(PATH_BACKGROUNDS + 'town1.png')
+        self.setBackground('town1.png')
         self.buttons: list[Button] = []
 
         self._setup_ui()
@@ -13,12 +13,11 @@ class LobbyScreen(BaseScreen):
     def _setup_ui(self) -> None:
         self.buttons = [
             Button(
-                x= 1100,
-                y= 100,
-                image_name='wood1_background.png',
+                x= 640,
+                y= 50,
+                image_name='status_background.png',
                 text= 'test',
-                callback= self.test,
-                font_size= 36
+                font_size= 18
             )
         ]
 
