@@ -1,50 +1,80 @@
 """Hero Gacha Game - จุดเริ่มต้นของเกม"""
 
-from file_game.code import Game
-from file_game.code.state import LoadingState, MainLobbyState, SettingsState, ProfileState, BookState, AddCodeState, MysticChestState, CelestialChestState
-from file_game.code.data.player_data import PlayerData
+import pygame
+import sys
+
+# Import ทุกอย่างที่ต้องใช้
+from src.core.game import Game
+from src.screen.loading_state import LoadingState
+from src.screen.main_lobby_state import MainLobbyState
+from src.screen.settings_state import SettingsState
+from src.screen.profile_state import ProfileState
+from src.screen.book_state import BookState
+from src.screen.add_code_state import AddCodeState
+from src.screen.mystic_chest_state import MysticChestState
+from src.screen.celestial_chest_state import CelestialChestState
+from src.screen.leaderboard_state import LeaderboardState
+from src.screen.mystic_info_state import MysticInfoState
+from src.screen.celestial_info_state import CelestialInfoState
+from src.screen.how_to_play_state import HowToPlayState
+
+
+# ตัวแปรสำหรับเก็บข้อมูลเกม
+game = None
+current_player = None  # 1 หรือ 2
+
+
+def setup_game():
+    """ตั้งค่าเกมครั้งแรก"""
+    global game
+    
+    # สร้างเกม
+    game = Game()
+    
+    # เพิ่มหน้าจอต่างๆ (states)
+    game.state_manager.add_state('loading', LoadingState(game))
+    game.state_manager.add_state('settings', SettingsState(game))
+    game.state_manager.add_state('add_code', AddCodeState(game))
+    game.state_manager.add_state('leaderboard', LeaderboardState(game))
+    game.state_manager.add_state('mystic_info', MysticInfoState(game))
+    game.state_manager.add_state('celestial_info', CelestialInfoState(game))
+    game.state_manager.add_state('how_to_play', HowToPlayState(game))
+    
+    # เริ่มที่หน้า loading (เลือกผู้เล่น)
+    game.change_state('loading')
+
+
+def save_player_data():
+    """บันทึกข้อมูลผู้เล่น"""
+    global game, current_player
+    
+    if game and hasattr(game, 'current_player_slot') and game.current_player_slot:
+        if game.save_game():
+            print(f"✓ บันทึกข้อมูล Player {game.current_player_slot} สำเร็จ")
+        else:
+            print("✗ บันทึกข้อมูลไม่สำเร็จ")
 
 
 def main():
-    """ฟังก์ชันหลักสำหรับรันเกม"""
-    # สร้างและรันเกม
-    game = Game()
+    """ฟังก์ชันหลัก - เริ่มเกม"""
     
-    # สร้างข้อมูลผู้เล่น (ใช้ร่วมกันทุก state)
-    player_data = PlayerData()
-    
-    # พยายามโหลดข้อมูลที่บันทึกไว้
-    save_file = "file_game/json/save_data.json"
-    if player_data.load_from_file(save_file):
-        print(f"โหลดข้อมูลเกมจาก {save_file} สำเร็จ")
-    else:
-        print("เริ่มเกมใหม่ด้วยข้อมูลเริ่มต้น")
-    
-    game.player_data = player_data  # เก็บ reference ไว้ใช้งานง่าย
-    
-    # เพิ่ม states ทั้งหมด
-    game.state_manager.add_state('loading', LoadingState(game))
-    game.state_manager.add_state('main_lobby', MainLobbyState(game, player_data))
-    game.state_manager.add_state('settings', SettingsState(game))
-    game.state_manager.add_state('profile', ProfileState(game, player_data))
-    game.state_manager.add_state('book', BookState(game, player_data))
-    game.state_manager.add_state('add_code', AddCodeState(game))
-    game.state_manager.add_state('mystic_chest', MysticChestState(game, player_data))
-    game.state_manager.add_state('celestial_chest', CelestialChestState(game, player_data))
-    
-    # เริ่มที่หน้า loading
-    game.change_state('loading')
+    # ตั้งค่าเกม
+    setup_game()
     
     # รันเกม
     try:
         game.run()
+    except KeyboardInterrupt:
+        print("\nกำลังปิดเกม...")
+    except Exception as e:
+        print(f"เกิดข้อผิดพลาด: {e}")
     finally:
-        # บันทึกข้อมูลผู้เล่นเมื่อปิดเกม
-        if player_data.save_to_file(save_file):
-            print(f"บันทึกข้อมูลเกมไปที่ {save_file} สำเร็จ")
-        else:
-            print("บันทึกข้อมูลเกมไม่สำเร็จ")
+        # บันทึกข้อมูลก่อนปิด
+        save_player_data()
+        print("ปิดเกมแล้ว")
 
 
+# เริ่มเกมเมื่อรันไฟล์นี้
 if __name__ == "__main__":
     main()
+
