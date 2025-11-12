@@ -22,7 +22,7 @@ class Game:
         
         # ระบบเพลง
         self.music_loaded = False
-        self._load_music()
+        # ไม่โหลดเพลงตอน init แล้ว จะโหลดตอนเลือกผู้เล่น
 
     def change_state(self, state_name):
         """พฤติกรรมเดิม: เฟดออก -> เปลี่ยน -> เฟดเข้า"""
@@ -53,6 +53,10 @@ class Game:
         self.player_data = player.load_player_data(player_slot)
         
         print(f"โหลดข้อมูล Player {player_slot} สำเร็จ")
+        
+        # โหลดและเล่นเพลง (ครั้งแรกหลังจากเลือกผู้เล่น)
+        if not self.music_loaded:
+            self._load_music()
         
         # อัปเดต states ที่ใช้ player_data
         self._update_player_states()
@@ -94,6 +98,10 @@ class Game:
         # อัปเดต volume ของเพลงตามค่าที่บันทึกไว้
         volume = self.player_data['settings'].get('volume', 50) / 100.0
         self.set_music_volume(volume)
+        
+        # เริ่มเพลงใหม่ถ้ายังไม่เล่น
+        if self.music_loaded and not pygame.mixer.music.get_busy():
+            pygame.mixer.music.play(-1)
         
         # สร้าง/อัปเดต states ที่ใช้ player_data
         try:

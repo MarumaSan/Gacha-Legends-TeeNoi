@@ -95,6 +95,7 @@ class SettingsState(GameState):
         self.background = None
         self.sound_slider = None
         self.save_button = None
+        self.logout_button = None
         self.font_title = None
         self.font_normal = None
         self.font_small = None
@@ -160,6 +161,18 @@ class SettingsState(GameState):
             button_img.fill((60, 60, 90, 255))
             pygame.draw.rect(button_img, (255, 255, 255, 40), button_img.get_rect(), border_radius=16)
         
+        # ปุ่ม LOGOUT (ใต้แถบเสียง)
+        logout_y = start_y + 100
+        self.logout_button = _ImageButton(
+            button_img,
+            center=(center_x, logout_y),
+            on_click=self.on_logout_click,
+            scale=1.2,
+            use_mask=True,
+            text="LOGOUT",
+            font=self.font_normal
+        )
+        
         # ปุ่ม SAVE (วางไว้ล่างสุด ใช้ _ImageButton เหมือนหน้าแรก)
         button_center_y = SCREEN_HEIGHT - 60  # วางล่างสุด
         self.save_button = _ImageButton(
@@ -198,6 +211,16 @@ class SettingsState(GameState):
         
         print(f"Volume adjusted to: {int(value)}%")
     
+    def on_logout_click(self):
+        """เมื่อกดปุ่ม LOGOUT - บันทึกและกลับไปหน้า loading"""
+        print("Logout button clicked - saving and returning to loading")
+        # บันทึกการตั้งค่า
+        if hasattr(self.game, 'current_player_slot') and self.game.current_player_slot is not None:
+            self.game.save_game()
+        
+        # กลับไปหน้า loading
+        self.game.change_state('loading')
+    
     def on_save_click(self):
         """เมื่อกดปุ่ม SAVE - บันทึกการตั้งค่าและกลับไปหน้าเดิม"""
         print("Save button clicked - saving settings")
@@ -233,6 +256,8 @@ class SettingsState(GameState):
         # ส่งต่อ event ไปยัง UI
         if self.sound_slider:
             self.sound_slider.handle_event(event)
+        if self.logout_button:
+            self.logout_button.handle_event(event)
         if self.save_button:
             self.save_button.handle_event(event)
     
@@ -246,6 +271,8 @@ class SettingsState(GameState):
         # อัปเดต UI
         if self.sound_slider:
             self.sound_slider.update()
+        if self.logout_button:
+            self.logout_button.update(dt)
         if self.save_button:
             self.save_button.update(dt)
         
@@ -272,9 +299,11 @@ class SettingsState(GameState):
             title_rect = title_surface.get_rect(center=(SCREEN_WIDTH // 2, 150))
             screen.blit(title_surface, title_rect)
         
-        # วาด UI (แถบปรับเสียงและปุ่ม SAVE)
+        # วาด UI (แถบปรับเสียง, ปุ่ม LOGOUT และปุ่ม SAVE)
         if self.sound_slider:
             self.sound_slider.draw(screen)
+        if self.logout_button:
+            self.logout_button.draw(screen)
         if self.save_button:
             self.save_button.draw(screen)
         
