@@ -98,7 +98,7 @@ class MysticInfoState(GameState):
         self.rates = {
             'legendary': 0.01,  # 1%
             'epic': 0.19,       # 19%
-            'rare': 0.79        # 79%
+            'rare': 0.80        # 80%
         }
         
         # สีของแต่ละ rarity
