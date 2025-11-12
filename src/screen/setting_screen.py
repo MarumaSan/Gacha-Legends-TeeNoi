@@ -34,6 +34,13 @@ class SettingScreen(BaseScreen):
             font_size= 40
         )
 
+        self.saveButton = Button(
+            x= 640,
+            y= 660,
+            image_name= 'save_button.png',
+            callback= self.backToLobby
+        )
+
     def handleEvents(self, events: list[pygame.event.Event]) -> None:
         for event in events:
             if event.type == pygame.MOUSEBUTTONDOWN:
@@ -61,3 +68,8 @@ class SettingScreen(BaseScreen):
         self.testtext.render(screen)
         self.sliderBar.render(screen)
         self.sliderButton.render(screen)
+        self.saveButton.render(screen)
+    
+    def backToLobby(self):
+        self.manager.changeScreen(LobbyScreen(self.manager))
+        print('teslfhaj')

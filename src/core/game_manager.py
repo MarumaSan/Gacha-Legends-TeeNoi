@@ -15,7 +15,7 @@ class GameManager:
         self.clock = pygame.time.Clock()
         
         self.running = False
-
+        
         self.currentScreen = LobbyScreen(self)
 
     def run(self):
