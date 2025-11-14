@@ -4,7 +4,6 @@ from src.ui.button import Button
 from src.ui.text_display import TextDisplay
 from src.ui.image import Image
 from src.screen.base_screen import BaseScreen
-from src.core.save_system import SaveSystem
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -146,12 +145,10 @@ class LoadScreen(BaseScreen):
             if done_count == len(self.images):
                 self.animating = False
 
-    # self.save_system = SaveSystem(player= 'player1')
-
     def player1(self):
-        self.manager.screenManager.changeScreen('lobby')
         self.manager.selectPlayer('player1')
+        self.manager.screenManager.changeScreen('lobby')
 
     def player2(self):
-        self.manager.screenManager.changeScreen('lobby')
         self.manager.selectPlayer('player2')
+        self.manager.screenManager.changeScreen('lobby')

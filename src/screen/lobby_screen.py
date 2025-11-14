@@ -23,7 +23,7 @@ class LobbyScreen(BaseScreen):
                 x= 640,
                 y= 70,
                 image_name='status_background.png',
-                text= f"{self.manager.player_data.coins}",
+                text= '0',
                 font_size= 18
             ),
             Button(
@@ -85,6 +85,9 @@ class LobbyScreen(BaseScreen):
     def render(self, screen):
         screen.blit(self.background, (0,0))
 
+        if self.statusButtons:
+            self.statusButtons[0].setText(f"{self.manager.player_data.coins}")
+
         for button in self.statusButtons:
             button.render(screen)
         
@@ -109,7 +112,6 @@ class LobbyScreen(BaseScreen):
 
     def _settingScreen(self):
         self.manager.screenManager.changeScreen('setting')
-        print('setting')
     
     def _mysticChest(self):
         print('mystic chest')

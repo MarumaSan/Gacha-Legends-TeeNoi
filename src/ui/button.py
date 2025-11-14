@@ -23,18 +23,18 @@ class Button:
         self.text = text
         self.callback = callback
 
-        if self.text:
-            self.font = pygame.font.Font(PATH_FONTS + 'Monocraft.ttf', font_size)
-            self.color = text_color
-            self.textSurface = self.font.render(self.text, True, self.color)
-            if text_x and text_y:
-                self.textRect = self.textSurface.get_rect(centerx = text_x, centery = text_y)
-            elif text_x:
-                self.textRect = self.textSurface.get_rect(centerx = text_x, centery=self.imageRect.centery)
-            elif text_y:
-                self.textRect = self.textSurface.get_rect(centerx=self.imageRect.centerx, centery = text_y)
-            else :
-                self.textRect = self.textSurface.get_rect(center=self.imageRect.center)
+        self.font_size = font_size
+        self.color = text_color
+        self.text_x = text_x
+        self.text_y = text_y
+
+        self.font = None
+        self.textSurface = None
+        self.textRect = None
+
+        if self.text is not None:
+            self.font = pygame.font.Font(PATH_FONTS + 'Monocraft.ttf', self.font_size)
+            self._update_text_surface()
                 
         self.enable = enable
 
@@ -48,8 +48,29 @@ class Button:
         if self.enable:
             screen.blit(self.image, self.imageRect)
 
-            if self.text:
+            if self.textSurface:
                 screen.blit(self.textSurface, self.textRect)
 
     def setEnable(self, enable: bool):
         self.enable = enable
+
+    def setText(self, text: str) -> None:
+        self.text = text
+        if self.font is None:
+            self.font = pygame.font.Font(PATH_FONTS + 'Monocraft.ttf', self.font_size)
+        self._update_text_surface()
+
+    def _update_text_surface(self) -> None:
+        if self.font is None or self.text is None:
+            return
+
+        self.textSurface = self.font.render(self.text, True, self.color)
+
+        if self.text_x and self.text_y:
+            self.textRect = self.textSurface.get_rect(centerx=self.text_x, centery=self.text_y)
+        elif self.text_x:
+            self.textRect = self.textSurface.get_rect(centerx=self.text_x, centery=self.imageRect.centery)
+        elif self.text_y:
+            self.textRect = self.textSurface.get_rect(centerx=self.imageRect.centerx, centery=self.text_y)
+        else:
+            self.textRect = self.textSurface.get_rect(center=self.imageRect.center)

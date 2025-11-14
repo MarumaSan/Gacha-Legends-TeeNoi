@@ -1,4 +1,5 @@
 import pygame
+from typing import Optional
 from src.utils.constants import SCREEN_WIDTH, SCREEN_HEIGHT, FPS, PATH_UI
 from src.model.player_data import PlayerData
 from src.core.save_system import SaveSystem
@@ -21,8 +22,13 @@ class GameManager:
         
         self.running = False
 
-        self.save_system = SaveSystem('player1')
-        self.player_data = self.load_or_create_player_data()
+        self.available_players = ('player1', 'player2')
+        self.save_systems: dict[str, SaveSystem] = {
+            player: SaveSystem(player) for player in self.available_players
+        }
+        self.players: dict[str, PlayerData] = {}
+        self.current_player_id: Optional[str] = None
+        self.player_data = self.selectPlayer(self.available_players[0])
 
         self.screenManager = ScreenManager(self)
 
@@ -64,12 +70,19 @@ class GameManager:
         self.screenManager.loadScreen('lobby', LobbyScreen(self))
         self.screenManager.loadScreen('setting', SettingScreen(self))
 
-    def selectPlayer(self, player: str):
-        self.save_system = SaveSystem(player)
-        self.player_data = self.load_or_create_player_data()
+    def selectPlayer(self, player: str) -> PlayerData:
+        if player not in self.save_systems:
+            self.save_systems[player] = SaveSystem(player)
+        if player not in self.players:
+            self.players[player] = self.load_or_create_player_data(
+                self.save_systems[player]
+            )
+        self.current_player_id = player
+        self.player_data = self.players[player]
+        return self.player_data
 
-    def load_or_create_player_data(self) -> PlayerData:
-        save_data = self.save_system.load_game()
+    def load_or_create_player_data(self, save_system: SaveSystem) -> PlayerData:
+        save_data = save_system.load_game()
 
         if save_data is not None:
             return PlayerData(
@@ -79,14 +92,14 @@ class GameManager:
                 rank=save_data["rank"],
                 used_codes=save_data["used_codes"]
             )
-        else :
-            default_data = self.save_system.create_new_save()
-            player_data = PlayerData(
-                coins=default_data["coins"],
-                owned_characters=default_data["owned_characters"],
-                setting=default_data["setting"],
-                rank=default_data["rank"],
-                used_codes=default_data["used_codes"]
-            )
-            self.save_system.save_game(player_data)
-            return player_data
+        
+        default_data = save_system.create_new_save()
+        player_data = PlayerData(
+            coins=default_data["coins"],
+            owned_characters=default_data["owned_characters"],
+            setting=default_data["setting"],
+            rank=default_data["rank"],
+            used_codes=default_data["used_codes"]
+        )
+        save_system.save_game(player_data)
+        return player_data
