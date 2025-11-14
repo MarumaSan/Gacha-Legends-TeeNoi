@@ -1,15 +1,14 @@
-from dataclasses import field
+from dataclasses import dataclass, field
 from src.model.character import Character
 
-class PlayerData:
-    def __init__(self):
-        self.coins: int = 1000
-        self.owned_characters: set[str] = field(default_factory=set)
-        self.setting: dict = field(default_factory=dict)
-        self.rank: int = 0
-        self.used_codes: set[str] = field(default_factory=set)
 
-        self.setting['volume'] = 0
+@dataclass
+class PlayerData:
+    coins: int = 1000
+    owned_characters: set[str] = field(default_factory=set)
+    setting: dict = field(default_factory=lambda: {"volume": 0})
+    rank: int = 0
+    used_codes: set[str] = field(default_factory=set)
 
     def add_character(self, character: Character) -> None:
         if character.id not in self.owned_characters:
@@ -30,4 +29,3 @@ class PlayerData:
         self.setting['volume'] = volume_percent
 
     
-

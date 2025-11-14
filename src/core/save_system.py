@@ -11,7 +11,7 @@ class SaveSystem:
             save_data = {
                 "coins": player_data.coins,
                 "owned_characters": list(player_data.owned_characters),
-                "setting": list(player_data.setting),
+                "setting": player_data.setting,
                 "rank": player_data.rank,
                 "used_codes": list(player_data.used_codes)
             }
@@ -54,7 +54,7 @@ class SaveSystem:
         default_data = {
             "coins": 1000,
             "owned_characters": set(),
-            "setting": set(),
+            "setting": {"volume": 0},
             "rank": 0,
             "used_codes": set()
         }

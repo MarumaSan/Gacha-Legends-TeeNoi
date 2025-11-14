@@ -67,22 +67,21 @@ class GameManager:
 
     def _load_or_create_player_data(self) -> PlayerData:
         save_data = self.save_system.load_game()
-        
+
         if save_data is not None:
             return PlayerData(
                 coins=save_data["coins"],
                 owned_characters=save_data["owned_characters"],
-                total_power=save_data["setting"],
-                cores_count=save_data["rank"],
+                setting=save_data["setting"],
+                rank=save_data["rank"],
                 used_codes=save_data["used_codes"]
             )
-        else:
+        else :
             default_data = self.save_system.create_new_save()
             return PlayerData(
                 coins=default_data["coins"],
                 owned_characters=default_data["owned_characters"],
-                total_power=default_data["setting"],
-                cores_count=default_data["rank"],
+                setting=default_data["setting"],
+                rank=default_data["rank"],
                 used_codes=default_data["used_codes"]
             )
-        
