@@ -13,8 +13,11 @@ class Image:
         enable: bool = True,
         width: int = None,
         height: int = None,
-        scale: float = 1.0
+        scale: float = 1.0,
+        target: tuple = None
     ):
+
+        self.target = target
 
         self.base_image = pygame.image.load(path_prefix + image_name).convert_alpha()
 

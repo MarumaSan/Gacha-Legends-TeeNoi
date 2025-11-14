@@ -21,3 +21,4 @@ class ScreenManager:
     def changeScreen(self, scene_name: str) -> None:
         self.currentScreen = self.screen[scene_name]
         self.currentScreen.transitioning = True
+        self.currentScreen.fade_alpha = 255

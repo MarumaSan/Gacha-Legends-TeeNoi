@@ -23,7 +23,7 @@ class GameManager:
 
         self.loadScreen()
 
-        self.screenManager.changeScreen('lobby')
+        self.screenManager.changeScreen('load')
 
     def run(self):
         self.running = True

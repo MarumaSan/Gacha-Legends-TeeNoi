@@ -84,13 +84,14 @@ class LobbyScreen(BaseScreen):
 
     def render(self, screen):
         screen.blit(self.background, (0,0))
-        self.update_transition(screen)
 
         for button in self.statusButtons:
             button.render(screen)
         
         for button in self.chestButtons:
             button.render(screen)
+
+        self.update_transition(screen)
 
     def handleEvents(self, events: list[pygame.event.Event]) -> None:
         for event in events:

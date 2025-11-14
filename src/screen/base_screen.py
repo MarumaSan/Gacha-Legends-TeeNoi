@@ -11,7 +11,7 @@ class BaseScreen:
 
         self.transitioning = True
         self.fade_alpha = 255
-        self.fade_speed = 8
+        self.fade_speed = 7
 
         self.screen_size = (SCREEN_WIDTH, SCREEN_HEIGHT)
         self.fade_surface = pygame.Surface(self.screen_size).convert_alpha()
@@ -33,6 +33,9 @@ class BaseScreen:
         self.background_path = PATH_BACKGROUNDS + background_name
         self.background = pygame.image.load(self.background_path).convert()
         self.background = pygame.transform.scale(self.background, (SCREEN_WIDTH, SCREEN_HEIGHT))
+
+        self.backgroundRect = self.background.get_rect()
+        self.center_x, self.center_y = self.backgroundRect.center
 
     def update_transition(self, screen: pygame.Surface):
         if self.transitioning:
