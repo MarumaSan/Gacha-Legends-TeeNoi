@@ -21,10 +21,9 @@ class GameManager:
         
         self.running = False
 
-        self.save_system = SaveSystem(player= 'player1')
+        self.save_system = SaveSystem('player1')
+        self.player_data = self.load_or_create_player_data()
 
-        self.player_data = self._load_or_create_player_data()
-        
         self.screenManager = ScreenManager(self)
 
         self.loadScreen()
@@ -65,7 +64,11 @@ class GameManager:
         self.screenManager.loadScreen('lobby', LobbyScreen(self))
         self.screenManager.loadScreen('setting', SettingScreen(self))
 
-    def _load_or_create_player_data(self) -> PlayerData:
+    def selectPlayer(self, player: str):
+        self.save_system = SaveSystem(player)
+        self.player_data = self.load_or_create_player_data()
+
+    def load_or_create_player_data(self) -> PlayerData:
         save_data = self.save_system.load_game()
 
         if save_data is not None:
@@ -78,10 +81,12 @@ class GameManager:
             )
         else :
             default_data = self.save_system.create_new_save()
-            return PlayerData(
+            player_data = PlayerData(
                 coins=default_data["coins"],
                 owned_characters=default_data["owned_characters"],
                 setting=default_data["setting"],
                 rank=default_data["rank"],
                 used_codes=default_data["used_codes"]
             )
+            self.save_system.save_game(player_data)
+            return player_data

@@ -4,6 +4,7 @@ from src.ui.button import Button
 from src.ui.text_display import TextDisplay
 from src.ui.image import Image
 from src.screen.base_screen import BaseScreen
+from src.core.save_system import SaveSystem
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -74,7 +75,8 @@ class LoadScreen(BaseScreen):
                 text= 'player 1',
                 font_size= 16,
                 text_color = COLOR_YELLOW,
-                enable= False
+                enable= False,
+                callback= self.player1
             ),
             Button(
                 x= self.center_x + 125,
@@ -83,7 +85,8 @@ class LoadScreen(BaseScreen):
                 text= 'player 2',
                 font_size= 16,
                 text_color = COLOR_YELLOW,
-                enable= False
+                enable= False,
+                callback= self.player2
             )
         ]
     
@@ -111,6 +114,10 @@ class LoadScreen(BaseScreen):
                     self.textDisplays[2].setEnable(True)
                     self.buttons[0].setEnable(True)
                     self.buttons[1].setEnable(True)
+            
+            for button in self.buttons:
+                if self.images[0].imageRect.centerx == self.images[0].target[0]:
+                    button.handleEvent(event)
     
     def update(self):
         if self.animating:
@@ -138,3 +145,13 @@ class LoadScreen(BaseScreen):
 
             if done_count == len(self.images):
                 self.animating = False
+
+    # self.save_system = SaveSystem(player= 'player1')
+
+    def player1(self):
+        self.manager.screenManager.changeScreen('lobby')
+        self.manager.selectPlayer('player1')
+
+    def player2(self):
+        self.manager.screenManager.changeScreen('lobby')
+        self.manager.selectPlayer('player2')

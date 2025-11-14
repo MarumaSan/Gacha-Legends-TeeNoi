@@ -23,7 +23,7 @@ class LobbyScreen(BaseScreen):
                 x= 640,
                 y= 70,
                 image_name='status_background.png',
-                text= '10000',
+                text= f"{self.manager.player_data.coins}",
                 font_size= 18
             ),
             Button(
