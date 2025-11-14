@@ -108,7 +108,7 @@ class LobbyScreen(BaseScreen):
         print('redeem Code')
 
     def _profileScreen(self):
-        print('profile')
+        self.manager.screenManager.changeScreen('profile')
 
     def _settingScreen(self):
         self.manager.screenManager.changeScreen('setting')

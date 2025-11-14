@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from src.core.game_manager import GameManager
 
-class Name(BaseScreen):
+class ProfileScreen(BaseScreen):
     def __init__(self, manager: 'GameManager'):
         super().__init__(manager)
 

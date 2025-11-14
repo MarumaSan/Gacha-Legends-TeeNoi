@@ -1,5 +1,4 @@
 import pygame
-from typing import Optional
 from src.utils.constants import SCREEN_WIDTH, SCREEN_HEIGHT, FPS, PATH_UI
 from src.model.player_data import PlayerData
 from src.core.save_system import SaveSystem
@@ -7,6 +6,7 @@ from src.core.screen_manager import ScreenManager
 from src.screen.load_screen import LoadScreen
 from src.screen.lobby_screen import LobbyScreen
 from src.screen.setting_screen import SettingScreen
+from src.screen.profile_screen import ProfileScreen
 
 class GameManager:
     def __init__(self):
@@ -22,13 +22,13 @@ class GameManager:
         
         self.running = False
 
-        self.available_players = ('player1', 'player2')
         self.save_systems: dict[str, SaveSystem] = {
-            player: SaveSystem(player) for player in self.available_players
+            'player1': SaveSystem('player1'),
+            'player2': SaveSystem('player2')
         }
         self.players: dict[str, PlayerData] = {}
-        self.current_player_id: Optional[str] = None
-        self.player_data = self.selectPlayer(self.available_players[0])
+        self.current_player_id: str = 'player1'
+        self.player_data = self.selectPlayer(self.current_player_id)
 
         self.screenManager = ScreenManager(self)
 
@@ -49,6 +49,12 @@ class GameManager:
             pygame.display.flip()
 
             self.clock.tick(FPS)
+
+    def loadScreen(self) -> None:
+        self.screenManager.loadScreen('load', LoadScreen(self))
+        self.screenManager.loadScreen('lobby', LobbyScreen(self))
+        self.screenManager.loadScreen('setting', SettingScreen(self))
+        self.screenManager.loadScreen('profile', ProfileScreen(self))
     
     def render(self) -> None:
         self.screenManager.currentScreen.render(self.screen)
@@ -65,18 +71,15 @@ class GameManager:
     def update(self) -> None:
         self.screenManager.currentScreen.update()
 
-    def loadScreen(self) -> None:
-        self.screenManager.loadScreen('load', LoadScreen(self))
-        self.screenManager.loadScreen('lobby', LobbyScreen(self))
-        self.screenManager.loadScreen('setting', SettingScreen(self))
-
     def selectPlayer(self, player: str) -> PlayerData:
         if player not in self.save_systems:
-            self.save_systems[player] = SaveSystem(player)
+            raise ValueError(f\"Unknown player slot: {player}\")
+
+        save_system = self.save_systems[player]
+
         if player not in self.players:
-            self.players[player] = self.load_or_create_player_data(
-                self.save_systems[player]
-            )
+            self.players[player] = self.load_or_create_player_data(save_system)
+
         self.current_player_id = player
         self.player_data = self.players[player]
         return self.player_data
