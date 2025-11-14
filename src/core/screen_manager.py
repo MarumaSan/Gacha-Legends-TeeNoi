@@ -20,3 +20,4 @@ class ScreenManager:
     
     def changeScreen(self, scene_name: str) -> None:
         self.currentScreen = self.screen[scene_name]
+        self.currentScreen.transitioning = True

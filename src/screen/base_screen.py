@@ -10,11 +10,10 @@ class BaseScreen:
         self.manager = manager
 
         self.transitioning = True
-        self.transition_phase = "in"
         self.fade_alpha = 255
-        self.fade_speed = 10
+        self.fade_speed = 8
 
-        self.screen_size = (1280, 720)
+        self.screen_size = (SCREEN_WIDTH, SCREEN_HEIGHT)
         self.fade_surface = pygame.Surface(self.screen_size).convert_alpha()
         self.fade_surface.fill((0, 0, 0))
 
@@ -35,14 +34,13 @@ class BaseScreen:
         self.background = pygame.image.load(self.background_path).convert()
         self.background = pygame.transform.scale(self.background, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
-    def setTransition(self, screen: pygame.Surface):
+    def update_transition(self, screen: pygame.Surface):
         if self.transitioning:
             self.fade_surface.set_alpha(self.fade_alpha)
             screen.blit(self.fade_surface, (0, 0))
-        
-            if self.transition_phase == "in":
-                self.fade_alpha -= self.fade_speed
-                if self.fade_alpha <= 0:
-                    self.fade_alpha = 0
-                    self.transitioning = False
-                    self.transition_phase = None
+
+            self.fade_alpha -= self.fade_speed
+            if self.fade_alpha <= 0:
+                self.fade_alpha = 255
+                self.transitioning = False
+                self.transition_phase = None

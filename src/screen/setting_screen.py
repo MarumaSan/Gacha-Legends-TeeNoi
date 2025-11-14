@@ -86,6 +86,7 @@ class SettingScreen(BaseScreen):
 
     def render(self, screen):
         screen.blit(self.background, (0,0))
+        self.update_transition(screen)
 
         self.textDisplay.render(screen)
         self.sliderBar.render(screen)

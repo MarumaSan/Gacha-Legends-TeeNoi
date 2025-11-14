@@ -84,6 +84,7 @@ class LobbyScreen(BaseScreen):
 
     def render(self, screen):
         screen.blit(self.background, (0,0))
+        self.update_transition(screen)
 
         for button in self.statusButtons:
             button.render(screen)
