@@ -1,6 +1,9 @@
 import pygame
 from src.utils.constants import SCREEN_WIDTH, SCREEN_HEIGHT, FPS, PATH_UI
+from src.core.screen_manager import ScreenManager
+from src.screen.load_screen import LoadScreen
 from src.screen.lobby_screen import LobbyScreen
+from src.screen.setting_screen import SettingScreen
 
 class GameManager:
     def __init__(self):
@@ -16,7 +19,15 @@ class GameManager:
         
         self.running = False
         
-        self.currentScreen = LobbyScreen(self)
+        self.screenManager = ScreenManager(self)
+
+        self.loadScreen()
+
+        self.screenManager.changeScreen('lobby')
+
+        self.render()
+
+        self.update()
 
     def run(self):
         self.running = True
@@ -31,7 +42,7 @@ class GameManager:
             self.clock.tick(FPS)
     
     def render(self) -> None:
-        self.currentScreen.render(self.screen)
+        self.screenManager.currentScreen.render(self.screen)
     
     def handleEvents(self) -> None:
         events = pygame.event.get()
@@ -40,7 +51,13 @@ class GameManager:
             if event.type == pygame.QUIT:
                 self.running = False
         
-        self.currentScreen.handleEvents(events)
-    
-    def changeScreen(self, new_screen):
-        self.currentScreen = new_screen
+        self.screenManager.currentScreen.handleEvents(events)
+
+    def update(self) -> None:
+        self.screenManager.currentScreen.update()
+
+    def loadScreen(self) -> None:
+        self.screenManager.loadScreen('load', LoadScreen(self))
+        self.screenManager.loadScreen('lobby', LobbyScreen(self))
+        self.screenManager.loadScreen('setting', SettingScreen(self))
+        

@@ -3,8 +3,12 @@ from src.screen.base_screen import BaseScreen
 from src.screen.setting_screen import SettingScreen
 from src.ui.button import Button
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from src.core.game_manager import GameManager
+
 class LobbyScreen(BaseScreen):
-    def __init__(self, manager):
+    def __init__(self, manager: 'GameManager'):
         super().__init__(manager)
         self.setBackground('town1.png')
         self.statusButtons: list[Button] = []
@@ -101,7 +105,7 @@ class LobbyScreen(BaseScreen):
         print('profile')
 
     def _settingScreen(self):
-        self.manager.changeScreen(SettingScreen(self.manager))
+        self.manager.screenManager.changeScreen('setting')
         print('setting')
     
     def _mysticChest(self):

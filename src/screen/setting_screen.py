@@ -2,22 +2,30 @@ import pygame
 from src.screen.base_screen import BaseScreen
 from src.ui.text_display import TextDisplay
 from src.ui.button import Button
+from src.utils.constants import *
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from src.core.game_manager import GameManager
 
 class SettingScreen(BaseScreen):
-    def __init__(self, manager):
+    def __init__(self, manager: 'GameManager'):
         super().__init__(manager)
         self.setBackground('town2.png')
 
-        self._setup_ui()
+        self.bg_rect = self.background.get_rect()
+        self.center_x, self.center_y = self.bg_rect.center
 
         self.dragging = False
+
+        self._setup_ui()
     
     def _setup_ui(self):
         self.sliderButton_x = 640
         self.sliderButton_y = 350
 
         self.sliderBar = Button(
-                x= 640,
+                x= self.center_x,
                 y= 350,
                 image_name= 'slider_bar.png'
         )
@@ -27,22 +35,36 @@ class SettingScreen(BaseScreen):
                 image_name= 'slider_button.png'
         )
 
-        self.testtext = TextDisplay(
-            x= 640,
-            y= 230,
+        self.textDisplay = TextDisplay(
+            x= self.center_x,
+            y= 200,
             text= 'SETTING',
-            font_size= 40
+            font_size= 60
         )
 
         self.saveButton = Button(
-            x= 640,
+            x= self.center_x,
             y= 660,
             image_name= 'save_button.png',
-            callback= self.backToLobby
+            callback= self._backToLobby
         )
+
+        self.button = Button(
+                x= self.center_x,
+                y= 470,
+                image_name= 'wood1_background.png',
+                font_size= 16,
+                text= 'Logout',
+                text_color= COLOR_YELLOW,
+                callback= self._backToLoad
+            )
 
     def handleEvents(self, events: list[pygame.event.Event]) -> None:
         for event in events:
+            self.saveButton.handleEvent(event)
+
+            self.button.handleEvent(event)
+
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if self.sliderButton.imageRect.collidepoint(event.pos):
                     self.dragging = True
@@ -65,11 +87,16 @@ class SettingScreen(BaseScreen):
     def render(self, screen):
         screen.blit(self.background, (0,0))
 
-        self.testtext.render(screen)
+        self.textDisplay.render(screen)
         self.sliderBar.render(screen)
         self.sliderButton.render(screen)
         self.saveButton.render(screen)
+        
+        self.button.render(screen)
+            
     
-    def backToLobby(self):
-        self.manager.changeScreen(LobbyScreen(self.manager))
-        print('teslfhaj')
+    def _backToLobby(self):
+        self.manager.screenManager.changeScreen('lobby')
+
+    def _backToLoad(self):
+        self.manager.screenManager.changeScreen('load')
