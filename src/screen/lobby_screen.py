@@ -10,6 +10,7 @@ if TYPE_CHECKING:
 class LobbyScreen(BaseScreen):
     def __init__(self, manager: 'GameManager'):
         super().__init__(manager)
+
         self.setBackground('town1.png')
         self.statusButtons: list[Button] = []
         self.chestButtons: list[Button] = []

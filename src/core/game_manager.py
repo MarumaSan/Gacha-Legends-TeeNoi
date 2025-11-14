@@ -25,10 +25,6 @@ class GameManager:
 
         self.screenManager.changeScreen('lobby')
 
-        self.render()
-
-        self.update()
-
     def run(self):
         self.running = True
         
@@ -36,6 +32,8 @@ class GameManager:
             self.handleEvents()
 
             self.render()
+
+            self.update()
 
             pygame.display.flip()
 

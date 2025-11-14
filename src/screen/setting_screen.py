@@ -39,7 +39,7 @@ class SettingScreen(BaseScreen):
             x= self.center_x,
             y= 200,
             text= 'SETTING',
-            font_size= 60
+            size= 60
         )
 
         self.saveButton = Button(
@@ -93,7 +93,6 @@ class SettingScreen(BaseScreen):
         self.saveButton.render(screen)
         
         self.button.render(screen)
-            
     
     def _backToLobby(self):
         self.manager.screenManager.changeScreen('lobby')
