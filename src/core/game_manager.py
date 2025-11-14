@@ -1,16 +1,21 @@
 import pygame
-from src.utils.constants import SCREEN_WIDTH, SCREEN_HEIGHT, FPS, PATH_UI
+from src.utils.constants import SCREEN_WIDTH, SCREEN_HEIGHT, FPS, PATH_UI,PATH_SOUND
 from src.model.player_data import PlayerData
 from src.core.save_system import SaveSystem
 from src.core.screen_manager import ScreenManager
 from src.screen.load_screen import LoadScreen
 from src.screen.lobby_screen import LobbyScreen
 from src.screen.setting_screen import SettingScreen
-from src.screen.profile_screen import ProfileScreen
+
 
 class GameManager:
     def __init__(self):
         pygame.init()
+
+        pygame.mixer.init()
+        pygame.mixer.music.load(PATH_SOUND + 'bgm.mp3')
+        pygame.mixer.music.play(-1)
+        pygame.mixer.music.set_volume(0)
 
         self.logo = pygame.image.load(PATH_UI + 'logo.png')
 
@@ -49,12 +54,6 @@ class GameManager:
             pygame.display.flip()
 
             self.clock.tick(FPS)
-
-    def loadScreen(self) -> None:
-        self.screenManager.loadScreen('load', LoadScreen(self))
-        self.screenManager.loadScreen('lobby', LobbyScreen(self))
-        self.screenManager.loadScreen('setting', SettingScreen(self))
-        self.screenManager.loadScreen('profile', ProfileScreen(self))
     
     def render(self) -> None:
         self.screenManager.currentScreen.render(self.screen)
@@ -71,15 +70,18 @@ class GameManager:
     def update(self) -> None:
         self.screenManager.currentScreen.update()
 
+    def loadScreen(self) -> None:
+        self.screenManager.loadScreen('load', LoadScreen(self))
+        self.screenManager.loadScreen('lobby', LobbyScreen(self))
+        self.screenManager.loadScreen('setting', SettingScreen(self))
+
     def selectPlayer(self, player: str) -> PlayerData:
         if player not in self.save_systems:
-            raise ValueError(f\"Unknown player slot: {player}\")
-
+            raise ValueError(f"Unknown player slot: {player}")
         save_system = self.save_systems[player]
 
         if player not in self.players:
             self.players[player] = self.load_or_create_player_data(save_system)
-
         self.current_player_id = player
         self.player_data = self.players[player]
         return self.player_data

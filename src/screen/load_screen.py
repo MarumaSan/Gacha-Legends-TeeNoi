@@ -148,7 +148,9 @@ class LoadScreen(BaseScreen):
     def player1(self):
         self.manager.selectPlayer('player1')
         self.manager.screenManager.changeScreen('lobby')
+        pygame.mixer.music.set_volume(self.manager.player_data.setting['volume'])
 
     def player2(self):
         self.manager.selectPlayer('player2')
         self.manager.screenManager.changeScreen('lobby')
+        pygame.mixer.music.set_volume(self.manager.player_data.setting['volume'])

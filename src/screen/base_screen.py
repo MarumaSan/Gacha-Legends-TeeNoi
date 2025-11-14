@@ -29,6 +29,13 @@ class BaseScreen:
     def update(self) -> None:
         pass
 
+    def on_enter(self) -> None:
+        self.transitioning = True
+        self.fade_alpha = 255
+    
+    def on_exit(self) -> None:
+        pass
+
     def setBackground(self, background_name: str) -> None:
         self.background_path = PATH_BACKGROUNDS + background_name
         self.background = pygame.image.load(self.background_path).convert()

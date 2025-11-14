@@ -21,7 +21,7 @@ class SettingScreen(BaseScreen):
         self._setup_ui()
     
     def _setup_ui(self):
-        self.sliderButton_x = 640
+        self.sliderButton_x = 620
         self.sliderButton_y = 350
 
         self.sliderBar = Button(
@@ -73,16 +73,17 @@ class SettingScreen(BaseScreen):
                 self.dragging = False
 
             if event.type == pygame.MOUSEMOTION and self.dragging:
-                mouse_x, mouse_y = event.pos
+                mouse_x, _ = event.pos
 
                 new_x = mouse_x - self.sliderButton.imageRect.width // 2
 
                 new_x = max(610, min(new_x, 750))
+                self.slider_value = (new_x - 610) / (750 - 610)
+                pygame.mixer.music.set_volume(round(self.slider_value, 2))
+                self.manager.player_data.setting['volume'] = self.slider_value
 
-                self.sliderButton.imageRect.x = new_x
+            self.sliderButton.imageRect.x = (self.manager.player_data.setting['volume'] * 140) + 610
 
-                slider_value = (new_x - 610) / (750 - 610)
-                print(f"value: {slider_value:.2f}")
 
     def render(self, screen):
         screen.blit(self.background, (0,0))
@@ -95,8 +96,15 @@ class SettingScreen(BaseScreen):
 
         self.update_transition(screen)
     
+    def update(self):
+        pass
+
+    def on_enter(self):
+        pass
+    
     def _backToLobby(self):
         self.manager.screenManager.changeScreen('lobby')
 
     def _backToLoad(self):
+        pygame.mixer.music.set_volume(0)
         self.manager.screenManager.changeScreen('load')

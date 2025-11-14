@@ -59,6 +59,12 @@ class Button:
         if self.font is None:
             self.font = pygame.font.Font(PATH_FONTS + 'Monocraft.ttf', self.font_size)
         self._update_text_surface()
+    
+    def setPosition(self, position: tuple[int, int]) -> None:
+        self.imageRect.center = position
+        if self.text is not None:
+            self._update_text_surface()
+
 
     def _update_text_surface(self) -> None:
         if self.font is None or self.text is None:

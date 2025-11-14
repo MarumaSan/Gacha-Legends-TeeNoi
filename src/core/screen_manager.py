@@ -10,15 +10,20 @@ if TYPE_CHECKING:
 
 class ScreenManager:
     
-    def __init__(self, game_manager: 'GameManager'):
-        self.game_manager = game_manager
+    def __init__(self, manager: 'GameManager'):
+        self.manager = manager
         self.screen: Dict[str, BaseScreen] = {}
         self.currentScreen: Optional[BaseScreen] = None
     
     def loadScreen(self, name: str, screen: BaseScreen) -> None:
         self.screen[name] = screen
     
-    def changeScreen(self, scene_name: str) -> None:
-        self.currentScreen = self.screen[scene_name]
-        self.currentScreen.transitioning = True
-        self.currentScreen.fade_alpha = 255
+    def changeScreen(self, screen_name: str) -> None:
+        if self.currentScreen is not None:
+            self.currentScreen.on_exit()
+
+        self.currentScreen = self.screen[screen_name]
+
+        self.manager.save_systems[self.manager.current_player_id].save_game(self.manager.player_data)
+
+        self.currentScreen.on_enter
