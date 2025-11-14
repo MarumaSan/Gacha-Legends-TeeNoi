@@ -1,4 +1,4 @@
-from math import sqrt, pow
+from src.model.character import Character
 
 SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 720
@@ -14,18 +14,8 @@ PATH_CARDS = 'assets/cards/'
 PATH_FONTS = 'assets/fonts/'
 PATH_PORTRAITS = 'assets/portraits/'
 PATH_UI = 'assets/ui/'
-
-class Character:
-    def __init__(self, id: int, name: str, rarity: str, atk: int, defense: int, portrait_path: str, card_front_path: str, card_back_path: str):
-        self.id = id
-        self.name = name
-        self.rarity = rarity
-        self.atk = atk
-        self.defense = defense
-        self.totalPower = round(sqrt(pow(self.atk, 2) + pow(self.defense, 2)))
-        self.portrait_path = portrait_path
-        self.card_front_path = card_front_path
-        self.card_back_path = card_back_path
+PATH_SOUND = 'assets/sound/'
+PATH_SAVE = 'saves/'
 
 CHARACTER: list[Character] = [
     Character(

@@ -1,5 +1,7 @@
 import pygame
 from src.utils.constants import SCREEN_WIDTH, SCREEN_HEIGHT, FPS, PATH_UI
+from src.model.player_data import PlayerData
+from src.core.save_system import SaveSystem
 from src.core.screen_manager import ScreenManager
 from src.screen.load_screen import LoadScreen
 from src.screen.lobby_screen import LobbyScreen
@@ -18,6 +20,10 @@ class GameManager:
         self.clock = pygame.time.Clock()
         
         self.running = False
+
+        self.save_system = SaveSystem(player= 'player1')
+
+        self.player_data = self._load_or_create_player_data()
         
         self.screenManager = ScreenManager(self)
 
@@ -58,4 +64,25 @@ class GameManager:
         self.screenManager.loadScreen('load', LoadScreen(self))
         self.screenManager.loadScreen('lobby', LobbyScreen(self))
         self.screenManager.loadScreen('setting', SettingScreen(self))
+
+    def _load_or_create_player_data(self) -> PlayerData:
+        save_data = self.save_system.load_game()
+        
+        if save_data is not None:
+            return PlayerData(
+                coins=save_data["coins"],
+                owned_characters=save_data["owned_characters"],
+                total_power=save_data["setting"],
+                cores_count=save_data["rank"],
+                used_codes=save_data["used_codes"]
+            )
+        else:
+            default_data = self.save_system.create_new_save()
+            return PlayerData(
+                coins=default_data["coins"],
+                owned_characters=default_data["owned_characters"],
+                total_power=default_data["setting"],
+                cores_count=default_data["rank"],
+                used_codes=default_data["used_codes"]
+            )
         
