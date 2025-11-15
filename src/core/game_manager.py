@@ -6,6 +6,7 @@ from src.core.screen_manager import ScreenManager
 from src.screen.load_screen import LoadScreen
 from src.screen.lobby_screen import LobbyScreen
 from src.screen.setting_screen import SettingScreen
+from src.screen.profile_screen import ProfileScreen
 
 
 class GameManager:
@@ -74,6 +75,7 @@ class GameManager:
         self.screenManager.loadScreen('load', LoadScreen(self))
         self.screenManager.loadScreen('lobby', LobbyScreen(self))
         self.screenManager.loadScreen('setting', SettingScreen(self))
+        self.screenManager.loadScreen('profile', ProfileScreen(self))
 
     def selectPlayer(self, player: str) -> PlayerData:
         if player not in self.save_systems:

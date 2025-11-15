@@ -18,3 +18,7 @@ dist/
 
 # Other
 template.py
+
+
+# self.manager.player_data.add_character(CHARACTER[1])
+# self.manager.save_systems[self.manager.current_player_id].save_game(self.manager.player_data)

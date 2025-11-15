@@ -13,16 +13,13 @@ class TextDisplay:
             enable: bool = True
     ):
 
-        self.text = text
-
-        if self.text:
-            self.font = pygame.font.Font(PATH_FONTS + 'Monocraft.ttf', size)
-            self.color = color
-            self.textSurface = self.font.render(self.text, True, self.color)
-            self.textRect = self.textSurface.get_rect(centerx = x, centery = y)
-                  
+        self.x = x
+        self.y = y
+        self.size = size
+        self.color = color
         self.enable = enable
 
+        self.setText(text)
 
     def render(self, screen: pygame.Surface) -> None:
         if not self.enable:
@@ -31,3 +28,10 @@ class TextDisplay:
 
     def setEnable(self, enable: bool):
         self.enable = enable
+
+    def setText(self, text: str) -> None:
+        self.text = text
+        if self.text:
+            self.font = pygame.font.Font(PATH_FONTS + 'Monocraft.ttf', self.size)
+            self.textSurface = self.font.render(self.text, True, self.color)
+            self.textRect = self.textSurface.get_rect(centerx = self.x, centery = self.y)

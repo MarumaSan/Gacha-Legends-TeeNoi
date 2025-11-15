@@ -28,4 +28,6 @@ class PlayerData:
     def setVolume(self, volume_percent) -> None:
         self.setting['volume'] = volume_percent
 
+        
+
     

@@ -80,7 +80,7 @@ class SettingScreen(BaseScreen):
                 new_x = max(610, min(new_x, 750))
                 self.slider_value = (new_x - 610) / (750 - 610)
                 pygame.mixer.music.set_volume(round(self.slider_value, 2))
-                self.manager.player_data.setting['volume'] = self.slider_value
+                self.manager.player_data.setting['volume'] = round(self.slider_value, 2)
 
             self.sliderButton.imageRect.x = (self.manager.player_data.setting['volume'] * 140) + 610
 
@@ -99,9 +99,6 @@ class SettingScreen(BaseScreen):
     def update(self):
         pass
 
-    def on_enter(self):
-        pass
-    
     def _backToLobby(self):
         self.manager.screenManager.changeScreen('lobby')
 

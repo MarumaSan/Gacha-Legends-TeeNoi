@@ -26,4 +26,4 @@ class ScreenManager:
 
         self.manager.save_systems[self.manager.current_player_id].save_game(self.manager.player_data)
 
-        self.currentScreen.on_enter
+        self.currentScreen.on_enter()
