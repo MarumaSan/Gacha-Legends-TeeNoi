@@ -141,25 +141,25 @@ class LeaderboardState(GameState):
         )
     
     def _load_leaderboard_data(self):
-        """โหลดข้อมูล Player 1 และ Player 2 แล้วเรียงตามพลังรวม"""
+        """โหลดข้อมูล Player 1 และ Player 2 แล้วเรียงตามแต้มชนะ"""
         self.leaderboard_data = []
         
         for slot in [1, 2]:
             data = player.load_player_data(slot)
-            total_power = player.get_total_power(data)
+            rank = data.get('rank', 0)  # แต้มชนะ
             hero_count = len(data['owned_heroes'])
             coins = data['coins']
             
             self.leaderboard_data.append({
                 'slot': slot,
                 'name': f'Player {slot}',
-                'power': total_power,
+                'rank': rank,
                 'heroes': hero_count,
                 'coins': coins
             })
         
-        # เรียงตามพลังรวม (มากไปน้อย)
-        self.leaderboard_data.sort(key=lambda x: x['power'], reverse=True)
+        # เรียงตามแต้มชนะ (มากไปน้อย)
+        self.leaderboard_data.sort(key=lambda x: x['rank'], reverse=True)
     
     def on_back_click(self):
         """กลับไปหน้าล็อบบี้"""
@@ -212,7 +212,7 @@ class LeaderboardState(GameState):
             
             # ข้อมูล
             if self.font_small:
-                info_text = f"Power: {entry['power']}  |  Heroes: {entry['heroes']}  |  Coins: {entry['coins']}"
+                info_text = f"Wins: {entry['rank']}  |  Heroes: {entry['heroes']}  |  Coins: {entry['coins']}"
                 info_surf = self.font_small.render(info_text, True, (200, 200, 200))
                 screen.blit(info_surf, (bg_rect.x + 120, bg_rect.y + 45))
         

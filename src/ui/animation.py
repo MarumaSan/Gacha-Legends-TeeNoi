@@ -59,15 +59,25 @@ class CardFlipAnimation:
         self.timer = 0.0
         self.active = False
         self.flip_progress = 0.0
+        self.delay = 0.0
+        self.delay_timer = 0.0
 
-    def start(self):
+    def start(self, delay=0.0):
         self.timer = 0.0
+        self.delay = max(0.0, float(delay))
+        self.delay_timer = 0.0
         self.active = True
         self.flip_progress = 0.0
 
     def update(self, dt):
         if not self.active:
             return True
+        
+        # รอ delay ก่อน
+        if self.delay_timer < self.delay:
+            self.delay_timer += float(dt)
+            return False
+        
         self.timer += float(dt)
         self.flip_progress = min(self.timer / self.duration, 1.0)
         if self.flip_progress >= 1.0:
@@ -76,10 +86,16 @@ class CardFlipAnimation:
         return False
 
     def get_scale_x(self):
+        # ถ้ายังอยู่ใน delay ให้แสดงการ์ดหลังเต็มขนาด
+        if self.delay_timer < self.delay:
+            return 1.0
         angle = self.flip_progress * math.pi
         return abs(math.cos(angle))
 
     def is_back_visible(self):
+        # ถ้ายังอยู่ใน delay ให้แสดงการ์ดหลัง
+        if self.delay_timer < self.delay:
+            return True
         return self.flip_progress < 0.5
 
 

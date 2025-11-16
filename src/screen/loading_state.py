@@ -84,6 +84,7 @@ class LoadingState(GameState):
 
         self.btn_player1 = None
         self.btn_player2 = None
+        self.btn_battle = None
         self.btn_quit = None
         self.btn_question = None
 
@@ -116,9 +117,10 @@ class LoadingState(GameState):
             pygame.draw.rect(base_img, (255, 255, 255, 40), base_img.get_rect(), border_radius=16)
 
         centers = [
-            (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 80),
-            (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2),
-            (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 80),
+            (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 120),
+            (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 40),
+            (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 40),
+            (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 120),
         ]
 
         self.btn_player1 = _ImageButton(
@@ -129,8 +131,12 @@ class LoadingState(GameState):
             base_img, centers[1], on_click=self.on_player2_click,
             scale=self.BUTTON_SCALE, use_mask=True, text="PLAYER 2", font=self.font
         )
+        self.btn_battle = _ImageButton(
+            base_img, centers[2], on_click=self.on_battle_click,
+            scale=self.BUTTON_SCALE, use_mask=True, text="BATTLE", font=self.font
+        )
         self.btn_quit = _ImageButton(
-            base_img, centers[2], on_click=self.on_exit_click,
+            base_img, centers[3], on_click=self.on_exit_click,
             scale=self.BUTTON_SCALE, use_mask=True, text="QUIT", font=self.font
         )
         
@@ -178,6 +184,15 @@ class LoadingState(GameState):
         else:
             self.game.change_state('main_lobby')
 
+    def on_battle_click(self):
+        if getattr(self.game.state_manager, "transitioning", False):
+            return
+        print("คลิกปุ่ม BATTLE")
+        if hasattr(self.game, "change_state_then_fade_in"):
+            self.game.change_state_then_fade_in('battle', duration=0.6)
+        else:
+            self.game.change_state('battle')
+    
     def on_exit_click(self):
         if getattr(self.game.state_manager, "transitioning", False):
             return
@@ -195,6 +210,7 @@ class LoadingState(GameState):
             return
         if self.btn_player1: self.btn_player1.handle_event(event)
         if self.btn_player2: self.btn_player2.handle_event(event)
+        if self.btn_battle: self.btn_battle.handle_event(event)
         if self.btn_quit: self.btn_quit.handle_event(event)
         if self.btn_question: self.btn_question.handle_event(event)
 
@@ -203,6 +219,7 @@ class LoadingState(GameState):
             return
         if self.btn_player1: self.btn_player1.update(dt)
         if self.btn_player2: self.btn_player2.update(dt)
+        if self.btn_battle: self.btn_battle.update(dt)
         if self.btn_quit: self.btn_quit.update(dt)
         if self.btn_question: self.btn_question.update(dt)
 
@@ -213,6 +230,7 @@ class LoadingState(GameState):
             screen.fill((30, 30, 60))
         if self.btn_player1: self.btn_player1.draw(screen)
         if self.btn_player2: self.btn_player2.draw(screen)
+        if self.btn_battle: self.btn_battle.draw(screen)
         if self.btn_quit: self.btn_quit.draw(screen)
         if self.btn_question: self.btn_question.draw(screen)
 

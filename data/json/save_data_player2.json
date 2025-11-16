@@ -1,9 +1,25 @@
 {
   "coins": 1000,
-  "owned_heroes": [],
+  "owned_heroes": [
+    13,
+    4,
+    2,
+    11,
+    14,
+    9,
+    5,
+    8,
+    18,
+    3,
+    6,
+    19,
+    7,
+    16,
+    12
+  ],
   "settings": {
-    "volume": 0.0,
+    "volume": 19.5,
     "sound_enabled": true
   },
-  "rank": 0
+  "rank": 2
 }

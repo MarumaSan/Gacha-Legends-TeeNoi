@@ -166,23 +166,23 @@ class ProfileState(GameState):
         self._load_leaderboard_data()
     
     def _load_leaderboard_data(self):
-        """โหลดข้อมูล Player 1 และ Player 2 แล้วเรียงตามพลังรวม"""
+        """โหลดข้อมูล Player 1 และ Player 2 แล้วเรียงตามแต้มชนะ"""
         from src.utils import player
         
         self.leaderboard_data = []
         
         for slot in [1, 2]:
             data = player.load_player_data(slot)
-            total_power = player.get_total_power(data)
+            rank = data.get('rank', 0)  # แต้มชนะ
             
             self.leaderboard_data.append({
                 'slot': slot,
                 'name': f'Player {slot}',
-                'power': total_power
+                'rank': rank
             })
         
-        # เรียงตามพลังรวม (มากไปน้อย)
-        self.leaderboard_data.sort(key=lambda x: x['power'], reverse=True)
+        # เรียงตามแต้มชนะ (มากไปน้อย)
+        self.leaderboard_data.sort(key=lambda x: x['rank'], reverse=True)
     
     def on_back_click(self):
         """Callback for Return button - go back to main lobby"""
@@ -279,22 +279,22 @@ class ProfileState(GameState):
             leader_title = self.font_title.render("LEADERBOARD", True, (0, 0, 0))
             screen.blit(leader_title, (right_x - leader_title.get_width() // 2, right_start_y))
         
-        # หัวตาราง NAME และ POWER
+        # หัวตาราง NAME และ WINS
         if self.font_normal:
             name_header = self.font_normal.render("NAME", True, (0, 0, 0))
-            power_header = self.font_normal.render("POWER", True, (0, 0, 0))
+            wins_header = self.font_normal.render("WINS", True, (0, 0, 0))
             
             screen.blit(name_header, (right_x - 100, right_start_y + 90))
-            screen.blit(power_header, (right_x + 50, right_start_y + 90))
+            screen.blit(wins_header, (right_x + 50, right_start_y + 90))
         
-        # แสดงรายชื่อและพลังในกระดานผู้นำ (Player 1 และ Player 2)
+        # แสดงรายชื่อและแต้มชนะในกระดานผู้นำ (Player 1 และ Player 2)
         if self.font_normal:
             for i, entry in enumerate(self.leaderboard_data[:5]):  # แสดงสูงสุด 5 อันดับ
                 y_pos = right_start_y + 130 + (i * 40)
                 
                 # แสดงอันดับ
-                rank_text = self.font_normal.render(f"#{i+1}", True, (0, 0, 0))
-                screen.blit(rank_text, (right_x - 130, y_pos))
+                rank_num_text = self.font_normal.render(f"#{i+1}", True, (0, 0, 0))
+                screen.blit(rank_num_text, (right_x - 130, y_pos))
                 
                 # แสดงชื่อ (ถ้าเป็น player ปัจจุบันให้แสดง "ME")
                 current_slot = self.game.current_player_slot if hasattr(self.game, 'current_player_slot') else None
@@ -302,9 +302,9 @@ class ProfileState(GameState):
                 name_text = self.font_normal.render(display_name, True, (0, 0, 0))
                 screen.blit(name_text, (right_x - 90, y_pos))
                 
-                # แสดงพลัง
-                power_text = self.font_normal.render(str(entry['power']), True, (0, 0, 0))
-                screen.blit(power_text, (right_x + 50, y_pos))
+                # แสดงแต้มชนะ
+                wins_text = self.font_normal.render(str(entry['rank']), True, (0, 0, 0))
+                screen.blit(wins_text, (right_x + 50, y_pos))
         
         # ปุ่ม VIEW FULL LEADERBOARD
         if self.leaderboard_button:

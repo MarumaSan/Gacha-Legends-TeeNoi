@@ -42,7 +42,7 @@ Gacha-Legends-TeeNoi/
 │   │
 │   ├── screen/            # หน้าจอต่างๆ ของเกม
 │   │   ├── loading_state.py        # หน้าเลือกผู้เล่น
-│   │   ├── how_to_play_state.py    # หน้าวิธีเล่น
+│   │   ├── how_to_play_state.py    # หน้าวิธีเล่น (17 หน้า)
 │   │   ├── main_lobby_state.py     # หน้าล็อบบี้หลัก
 │   │   ├── profile_state.py        # หน้าโปรไฟล์และสถิติ
 │   │   ├── book_state.py           # หน้าคอลเลคชั่น
@@ -50,6 +50,7 @@ Gacha-Legends-TeeNoi/
 │   │   ├── celestial_chest_state.py # หน้าสุ่ม Celestial Chest
 │   │   ├── mystic_info_state.py    # ข้อมูล Mystic Chest
 │   │   ├── celestial_info_state.py # ข้อมูล Celestial Chest
+│   │   ├── battle_state.py         # หน้าต่อสู้ระหว่างผู้เล่น
 │   │   ├── settings_state.py       # หน้าตั้งค่า
 │   │   ├── add_code_state.py       # หน้ากรอกโค้ด
 │   │   └── leaderboard_state.py    # หน้าอันดับ
@@ -76,7 +77,7 @@ Gacha-Legends-TeeNoi/
 │   ├── ui/               # รูป UI
 │   ├── fonts/            # ฟอนต์
 │   ├── song/             # เพลงพื้นหลัง
-│   └── How_to_play/      # รูปวิธีเล่น (1-13.png)
+│   └── How_to_play/      # รูปวิธีเล่น (1-17.png)
 │
 └── data/json/            # ข้อมูล JSON
     ├── codes.json        # โค้ดแลกรางวัล
@@ -140,16 +141,16 @@ current_state.enter()
 
 ```
 ┌─────────────────┐
-│ Loading Screen  │ ← เลือก Player 1 หรือ 2
+│ Loading Screen  │ ← เลือก Player 1, Player 2, BATTLE, QUIT
 └────────┬────────┘
          │ กด ?
-         ├──────────────┐
-         │              │
-         ↓              ↓
-┌─────────────────┐  ┌──────────────┐
-│  How to Play    │  │ Settings     │
-│  (13 หน้า)      │  │ - Volume     │
-└─────────────────┘  └──────────────┘
+         ├──────────────┬──────────────┐
+         │              │              │
+         ↓              ↓              ↓
+┌─────────────────┐  ┌──────────┐  ┌──────────────┐
+│  How to Play    │  │ Settings │  │ Battle Mode  │
+│  (17 หน้า)      │  │ - Volume │  │ (PvP)        │
+└─────────────────┘  └──────────┘  └──────────────┘
          │
          ↓
 ┌─────────────────────────────────────┐
@@ -168,8 +169,8 @@ current_state.enter()
 │ - 100/900   │ │150/1350  │ │ 2 ตัว/   │  │- Stats   │
 │   coins     │ │  coins   │ │  หน้า    │  │- Leader  │
 │ - กด ?      │ │ - กด ?   │ │          │  │  board   │
-│   ดู rate   │ │   ดู rate│ │          │  └──────────┘
-└─────────────┘ └──────────┘ └─────────┘
+│   ดู rate   │ │   ดู rate│ │          │  │ (Wins)   │
+└─────────────┘ └──────────┘ └─────────┘  └──────────┘
        │             │
        ↓             ↓
 ┌─────────────┐ ┌──────────┐
@@ -215,7 +216,7 @@ Player Data (dict)
   ├── coins: int
   ├── owned_heroes: [hero_id, ...]
   ├── settings: {volume, sound_enabled}
-  └── rank: int
+  └── rank: int (แต้มชนะจาก Battle)
 
 บันทึกที่:
   - data/json/save_data_player1.json
@@ -225,6 +226,7 @@ Player Data (dict)
   - สุ่มตัวละคร
   - เปลี่ยนการตั้งค่า
   - ใช้โค้ด
+  - จบการต่อสู้ (Battle)
   - ปิดเกม
 ```
 
@@ -251,10 +253,36 @@ codes.json → โค้ดที่มีทั้งหมด
   - แสดง animation "+XXX"
 ```
 
+### ระบบ Battle (PvP)
+```
+เลือก BATTLE จากหน้า Loading
+  ↓
+กรอกจำนวนเงินเดิมพัน
+  ↓
+Player 1: สุ่มการ์ด 5 ใบ
+  ↓
+เลือกการ์ด 1 ใบ → ยืนยัน
+  ↓
+Player 2: สุ่มการ์ด 5 ใบ
+  ↓
+เลือกการ์ด 1 ใบ → ยืนยัน
+  ↓
+เปรียบเทียบพลัง (animation 3 วินาที)
+  ↓
+แสดงผลต่างพลัง
+  ↓
+กด Enter → แสดงผลชนะ/แพ้
+  ↓
+- ผู้ชนะ: +เงิน, +1 แต้มชนะ
+- ผู้แพ้: -เงิน
+  ↓
+กด Enter → กลับหน้า Loading
+```
+
 ### ระบบ Leaderboard
 - โหลดข้อมูล Player 1 และ Player 2
-- คำนวณพลังรวมจากตัวละครที่มี
-- เรียงตามพลัง (มากไปน้อย)
+- คำนวณแต้มชนะจากการต่อสู้
+- เรียงตามแต้มชนะ (มากไปน้อย)
 - แสดงใน Profile และหน้า Leaderboard แยก
 
 ### ระบบ Animation
@@ -285,12 +313,12 @@ codes.json → โค้ดที่มีทั้งหมด
 ## 🎨 Assets ที่ต้องมี
 
 ### รูปภาพ
-- `backgrounds/`: town_1.png, town_2.png, summon_1.png, summon_2.png, book.png
+- `backgrounds/`: town_1.png, town_2.png, summon_1.png, summon_2.png, book.png, arena.png
 - `portraits/`: hero1.png - hero21.png
 - `cards/front/`: hero1.png - hero21.png
-- `cards/back/`: rare.PNG, legendary.PNG, extreme.PNG
-- `ui/`: ปุ่มต่างๆ, กรอบ, ไอคอน
-- `How_to_play/`: 1.png - 13.png
+- `cards/back/`: 1.PNG, 2.PNG, 3.PNG (ตาม rarity)
+- `ui/`: ปุ่มต่างๆ, กรอบ, ไอคอน, left botton.png, right botton.png
+- `How_to_play/`: 1.png - 17.png
 
 ### เสียง
 - `song/bgm.mp3`: เพลงพื้นหลัง

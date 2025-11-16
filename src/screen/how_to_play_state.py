@@ -80,13 +80,13 @@ class _ImageButton:
 
 
 class HowToPlayState(GameState):
-    """หน้าแสดงวิธีเล่น - มีรูป 13 หน้า"""
+    """หน้าแสดงวิธีเล่น - มีรูป 17 หน้า"""
     
     def __init__(self, game):
         super().__init__(game)
         
-        self.current_page = 1  # หน้าปัจจุบัน (1-13)
-        self.total_pages = 13  # จำนวนหน้าทั้งหมด
+        self.current_page = 1  # หน้าปัจจุบัน (1-17)
+        self.total_pages = 17  # จำนวนหน้าทั้งหมด
         
         self.background = None
         self.font_small = None

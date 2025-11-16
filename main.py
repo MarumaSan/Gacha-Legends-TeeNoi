@@ -17,6 +17,7 @@ from src.screen.leaderboard_state import LeaderboardState
 from src.screen.mystic_info_state import MysticInfoState
 from src.screen.celestial_info_state import CelestialInfoState
 from src.screen.how_to_play_state import HowToPlayState
+from src.screen.battle_state import BattleState
 
 
 # ตัวแปรสำหรับเก็บข้อมูลเกม
@@ -39,6 +40,7 @@ def setup_game():
     game.state_manager.add_state('mystic_info', MysticInfoState(game))
     game.state_manager.add_state('celestial_info', CelestialInfoState(game))
     game.state_manager.add_state('how_to_play', HowToPlayState(game))
+    game.state_manager.add_state('battle', BattleState(game))
     
     # เริ่มที่หน้า loading (เลือกผู้เล่น)
     game.change_state('loading')
