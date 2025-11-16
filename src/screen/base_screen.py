@@ -32,6 +32,11 @@ class BaseScreen:
     def on_enter(self) -> None:
         self.transitioning = True
         self.fade_alpha = 255
+
+        self.start_screen()
+    
+    def start_screen(self) -> None:
+        pass
     
     def on_exit(self) -> None:
         pass

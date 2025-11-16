@@ -32,9 +32,12 @@ class GameManager:
             'player1': SaveSystem('player1'),
             'player2': SaveSystem('player2')
         }
-        self.players: dict[str, PlayerData] = {}
-        self.current_player_id: str = 'player1'
-        self.player_data = self.selectPlayer(self.current_player_id)
+        self.players: dict[str, PlayerData] = {
+            'player1' : self.load_or_create_player_data(self.save_systems['player1']),
+            'player2' : self.load_or_create_player_data(self.save_systems['player2'])
+        }
+        self.player_data = self.selectPlayer('player1')
+        self.player_data = self.selectPlayer('player2')
 
         self.screenManager = ScreenManager(self)
 
@@ -78,15 +81,14 @@ class GameManager:
         self.screenManager.loadScreen('profile', ProfileScreen(self))
 
     def selectPlayer(self, player: str) -> PlayerData:
-        if player not in self.save_systems:
-            raise ValueError(f"Unknown player slot: {player}")
-        save_system = self.save_systems[player]
-
-        if player not in self.players:
-            self.players[player] = self.load_or_create_player_data(save_system)
         self.current_player_id = player
         self.player_data = self.players[player]
         return self.player_data
+    
+    def getPlayerData(self, player: str) -> PlayerData:
+        self.player_data = self.players[player]
+        return self.player_data
+
 
     def load_or_create_player_data(self, save_system: SaveSystem) -> PlayerData:
         save_data = save_system.load_game()

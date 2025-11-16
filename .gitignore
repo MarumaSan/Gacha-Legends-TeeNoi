@@ -18,6 +18,7 @@ dist/
 
 # Other
 template.py
+game_manager_copy.py
 
 
 # self.manager.player_data.add_character(CHARACTER[1])
