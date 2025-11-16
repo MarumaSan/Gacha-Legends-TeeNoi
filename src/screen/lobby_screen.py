@@ -120,4 +120,4 @@ class LobbyScreen(BaseScreen):
         print('celestial chest')
 
     def _collectionScreen(self):
-        print('Collection')
+        self.manager.screenManager.changeScreen('collection')

@@ -7,6 +7,7 @@ from src.screen.load_screen import LoadScreen
 from src.screen.lobby_screen import LobbyScreen
 from src.screen.setting_screen import SettingScreen
 from src.screen.profile_screen import ProfileScreen
+from src.screen.collection_screen import Collection
 
 
 class GameManager:
@@ -43,7 +44,7 @@ class GameManager:
 
         self.loadScreen()
 
-        self.screenManager.changeScreen('load')
+        self.screenManager.changeScreen('collection')
 
     def run(self):
         self.running = True
@@ -79,6 +80,7 @@ class GameManager:
         self.screenManager.loadScreen('lobby', LobbyScreen(self))
         self.screenManager.loadScreen('setting', SettingScreen(self))
         self.screenManager.loadScreen('profile', ProfileScreen(self))
+        self.screenManager.loadScreen('collection', Collection(self))
 
     def selectPlayer(self, player: str) -> PlayerData:
         self.current_player_id = player
