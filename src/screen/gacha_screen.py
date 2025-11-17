@@ -100,8 +100,6 @@ class GachaScreen(BaseScreen):
             )
         ]
 
-
-
     def render(self, screen):
         screen.blit(self.background, (0,0))
 
