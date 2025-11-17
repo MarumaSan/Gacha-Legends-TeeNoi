@@ -104,6 +104,12 @@ class Image:
         old_center = self.imageRect.center
         self.imageRect = self.image.get_rect(center=old_center)
 
+    def setScale(self, scale: float) -> None:
+        self._scale = scale
+        self.image = self._build_image()
+        self._original_image = self.image.copy()
+        self.imageRect = self.image.get_rect(center=self.imageRect.center)
+
     def setTarget(self, x: int, y: int) -> None:
         self.target = (x, y)
 
