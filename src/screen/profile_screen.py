@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from src.core.game_manager import GameManager
 
-CHARACTER_BY_ID = {char.id: char for char in CHARACTER}
+# CHARACTER_BY_ID = {char.id: char for char in CHARACTER}
 
 
 class ProfileScreen(BaseScreen):
@@ -150,7 +150,7 @@ class ProfileScreen(BaseScreen):
         for image in self.images:
             image.render(screen)
 
-        self.textDisplays[2].setText(f'{self.get_total_power(self.manager.current_player_id)}')
+        self.textDisplays[2].setText(f'{self.manager.helpers.get_total_power(self.manager.current_player_id)}')
         self.textDisplays[4].setText(f'{len(self.manager.player_data.owned_characters)} / {len(CHARACTER)}')
         self.textDisplays[6].setText(f'{self.manager.player_data.coins}')
         self.textDisplays[9].setText(f'{self.leaderboard[0]['name']}')
@@ -175,15 +175,15 @@ class ProfileScreen(BaseScreen):
         another_player = 'player1' if self.manager.current_player_id != 'player1' else 'player2'
         another_player_name = 'PLAYER 1' if self.manager.current_player_id != 'player1' else 'PLAYER 2'
         players = [
-            {"name": "ME", "power": self.get_total_power(self.manager.current_player_id)},
-            {"name": another_player_name, "power": self.get_total_power(another_player)}
+            {"name": "ME", "power": self.manager.helpers.get_total_power(self.manager.current_player_id)},
+            {"name": another_player_name, "power": self.manager.helpers.get_total_power(another_player)}
         ]
         self.leaderboard = sorted(players, key=lambda x: x["power"], reverse=True)
         
-    def get_total_power(self, Player: str):
-        total = 0
-        for hero_id in self.manager.getPlayerData(Player).owned_characters:
-            hero = CHARACTER_BY_ID.get(hero_id)
-            if hero:
-                total += hero.totalPower
-        return total
+    # def get_total_power(self, Player: str):
+    #     total = 0
+    #     for hero_id in self.manager.getPlayerData(Player).owned_characters:
+    #         hero = CHARACTER_BY_ID.get(hero_id)
+    #         if hero:
+    #             total += hero.totalPower
+    #     return total

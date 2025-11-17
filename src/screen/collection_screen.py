@@ -112,50 +112,32 @@ class Collection(BaseScreen):
     def start_screen(self):
         self.page = 1
 
-        # self.image_list = [f'hero{i + 1}.png' for i in range(len(CHARACTER))]
+        self.update_page()
 
     def backward(self):
-        self.update_page(-1)
+        if self.page == ceil(len(CHARACTER) / 2):
+            self.images[1].setEnable(True)
+            self.textDisplays[1].setEnable(True)
+        self.page -= 1
+        self.update_page()
 
     def forward(self):
-        self.update_page(1)
+        self.page += 1
+        self.update_page()
 
-    def update_page(self, c):
-        if len(CHARACTER) % 2 == 0:
-            if 1 <= self.page < floor(len(CHARACTER) / 2):
-                self.page += c
+    def update_page(self):
+        self.page = max(1, min(ceil(len(CHARACTER) / 2), self.page))
 
-                image1 = f'hero{(2 * self.page) - 1}.png'
-                image2 = f'hero{(2 * self.page)}.png'
+        image1 = f'hero{(2 * self.page) - 1}.png'
+        character1_name = f'{CHARACTER[(2 * self.page) - 2].name}'
+        self.images[0].setImage(image1)
+        self.textDisplays[0].setText(character1_name)
 
-                self.images[0].setImage(image1)
-                self.images[1].setImage(image2)
+        if self.page != ceil(len(CHARACTER) / 2):
+            image2 = f'hero{(2 * self.page)}.png'
+            self.images[1].setImage(image2)
+            character2_name = f'{CHARACTER[(2 * self.page) - 1].name}'
+            self.textDisplays[1].setText(character2_name)
         else:
-            if 1 <= self.page < floor(len(CHARACTER) / 2):
-                self.page += c
-
-                image1 = f'hero{(2 * self.page) - 1}.png'
-                image2 = f'hero{(2 * self.page)}.png'
-
-                self.images[0].setImage(image1)
-                self.images[1].setImage(image2)
-            
-            if self.page == floor(len(CHARACTER) / 2):
-                self.page += 1
-
-                image1 = f'hero{(2 * self.page) - 1}.png'
-                image2 = f'hero{(2 * self.page)}.png'
-
-                self.images[0].setImage(image1)
-                self.images[1].setEnable(False)
-                self.textDisplays[1].setEnable(False)
-
-
-        
-    def get_total_power(self, Player: str):
-        total = 0
-        for hero_id in self.manager.getPlayerData(Player).owned_characters:
-            hero = CHARACTER_BY_ID.get(hero_id)
-            if hero:
-                total += hero.totalPower
-        return total
+            self.images[1].setEnable(False)
+            self.textDisplays[1].setEnable(False)
