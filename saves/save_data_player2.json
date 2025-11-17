@@ -1,11 +1,11 @@
 {
-  "coins": 7500,
+  "coins": 17499,
   "owned_characters": [
     1,
     2
   ],
   "setting": {
-    "volume": 0.06
+    "volume": 0.04
   },
   "rank": 0,
   "used_codes": []

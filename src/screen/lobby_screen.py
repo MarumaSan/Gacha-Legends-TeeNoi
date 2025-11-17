@@ -114,10 +114,12 @@ class LobbyScreen(BaseScreen):
         self.manager.screenManager.changeScreen('setting')
     
     def _mysticChest(self):
+        self.manager.chest_type = 'mystic'
         self.manager.screenManager.changeScreen('gacha')
 
     def _celestialChest(self):
-        print('celestial chest')
+        self.manager.chest_type = 'celestial'
+        self.manager.screenManager.changeScreen('gacha')
 
     def _collectionScreen(self):
         self.manager.screenManager.changeScreen('collection')

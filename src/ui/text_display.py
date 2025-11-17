@@ -10,7 +10,8 @@ class TextDisplay:
             text: str,
             color: tuple[int, int, int] = COLOR_WHITE,
             size: int = 32,
-            enable: bool = True
+            enable: bool = True,
+            callback: Callable = None
     ):
 
         self.x = x
@@ -18,6 +19,9 @@ class TextDisplay:
         self.size = size
         self.color = color
         self.enable = enable
+        self.text = text
+
+        self.callback = callback
 
         self.setText(text)
 
@@ -35,3 +39,17 @@ class TextDisplay:
             self.font = pygame.font.Font(PATH_FONTS + 'Monocraft.ttf', self.size)
             self.textSurface = self.font.render(self.text, True, self.color)
             self.textRect = self.textSurface.get_rect(centerx = self.x, centery = self.y)
+
+    def setColor(self, color):
+        self.color = color
+
+        self.setText(self.text)
+
+    def handleEvent(self, event: pygame.event.Event) -> None:
+        if not self.enable:
+            return
+
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            if self.textRect.collidepoint(event.pos):
+                if callable(self.callback):
+                    self.callback()

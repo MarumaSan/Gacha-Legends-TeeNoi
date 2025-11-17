@@ -17,6 +17,8 @@ class Image:
         target: tuple[int, int] | None = None,
         move_speed: float = 10.0,
     ):
+        self.x  = x
+        self.y  = y
 
         self.image_name = image_name
         self.path_prefix = path_prefix
@@ -31,9 +33,7 @@ class Image:
         self.target: tuple[int, int] | None = target
         self.move_speed: float = move_speed
 
-        self.base_image: pygame.Surface = pygame.image.load(
-            self.path_prefix + self.image_name
-        ).convert_alpha()
+        self.base_image: pygame.Surface = pygame.image.load(self.path_prefix + self.image_name).convert_alpha()
 
         self.image: pygame.Surface = self._build_image()
         self._original_image: pygame.Surface = self.image.copy()
@@ -137,3 +137,11 @@ class Image:
     def resetColor(self):
         self.image = self._original_image.copy()
         self.imageRect = self.image.get_rect(center=self.imageRect.center)
+
+    def setImage(self, image_name: str):
+        self.base_image: pygame.Surface = pygame.image.load(self.path_prefix + image_name).convert_alpha()
+
+        self.image: pygame.Surface = self._build_image()
+        self._original_image: pygame.Surface = self.image.copy()
+
+        self.imageRect: pygame.Rect = self.image.get_rect(center=(self.x, self.y))

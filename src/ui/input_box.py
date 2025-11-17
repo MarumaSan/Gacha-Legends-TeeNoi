@@ -1,4 +1,5 @@
 import pygame
+from typing import Callable
 from src.utils.constants import PATH_FONTS, COLOR_WHITE
 
 class InputBox:
@@ -11,7 +12,7 @@ class InputBox:
             text: str = '',
             default_text: str = '',
             size: int = 32,
-            color = COLOR_WHITE
+            color = COLOR_WHITE,
     ):  
         self.rect = pygame.Rect(x, y, w, h)
 

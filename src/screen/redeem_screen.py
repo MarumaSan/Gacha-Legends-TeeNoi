@@ -104,16 +104,17 @@ class RedeemScreen(BaseScreen):
 
             if self.input_box.handle_event(event) == "SUBMIT":
                 if self.input_box.submit_text in self.redeem_code :
-                    self.manager.player_data.coins += REDEEM_CODES[self.input_box.submit_text]
-                    self.textDisplays[1].setText(f'COINS : {self.manager.player_data.coins}')
-                    self.textDisplays[2].setEnable(True)
-                    self.textDisplays[2].setText(f'+ {REDEEM_CODES[self.input_box.submit_text]}')
-                    self.manager.save_systems[self.manager.current_player_id].save_game(self.manager.player_data)
+                    if self.manager.player_data.use_code(self.input_box.submit_text, REDEEM_CODES[self.input_box.submit_text]):
+                        self.textDisplays[1].setText(f'COINS : {self.manager.player_data.coins}')
+                        self.textDisplays[2].setEnable(True)
+                        self.textDisplays[2].setText(f'+ {REDEEM_CODES[self.input_box.submit_text]}')
+                        self.manager.save_systems[self.manager.current_player_id].save_game(self.manager.player_data)
                 
 
     def start_screen(self):
         self.textDisplays[1].setText(f'COINS : {self.manager.player_data.coins}')
-        pass
+        
+        self.textDisplays[2].setEnable(True)
 
     def backToLobby(self):
         self.manager.screenManager.changeScreen('lobby')

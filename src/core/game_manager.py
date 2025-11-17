@@ -43,11 +43,13 @@ class GameManager:
         self.player_data = self.selectPlayer('player1')
         self.player_data = self.selectPlayer('player2')
 
+        self.chest_type = None
+
         self.screenManager = ScreenManager(self)
 
         self.loadScreen()
 
-        self.screenManager.changeScreen('redeem')
+        self.screenManager.changeScreen('gacha')
 
         self.helpers = Helpers(self)
 

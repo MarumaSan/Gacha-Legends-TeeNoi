@@ -16,6 +16,8 @@ class Button:
             callback: Callable = None,
             enable: bool = True
     ):
+        self.x  = x
+        self.y  = y
 
         self.image = pygame.image.load(PATH_UI + image_name).convert_alpha()
         self.imageRect = self.image.get_rect(center=(x, y))
@@ -80,3 +82,7 @@ class Button:
             self.textRect = self.textSurface.get_rect(centerx=self.imageRect.centerx, centery=self.text_y)
         else:
             self.textRect = self.textSurface.get_rect(center=self.imageRect.center)
+        
+    def setImage(self, image_name):
+        self.image = pygame.image.load(PATH_UI + image_name).convert_alpha()
+        self.imageRect = self.image.get_rect(center=(self.x, self.y))
