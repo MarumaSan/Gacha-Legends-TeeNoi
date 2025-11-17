@@ -31,14 +31,20 @@ class Image:
         self.target: tuple[int, int] | None = target
         self.move_speed: float = move_speed
 
-        self.base_image: pygame.Surface = pygame.image.load(self.path_prefix + self.image_name).convert_alpha()
+        self.base_image: pygame.Surface = pygame.image.load(
+            self.path_prefix + self.image_name
+        ).convert_alpha()
 
         self.image: pygame.Surface = self._build_image()
+        self._original_image: pygame.Surface = self.image.copy()
+
         self.imageRect: pygame.Rect = self.image.get_rect(center=(x, y))
 
     def _build_image(self) -> pygame.Surface:
         if self._width is not None and self._height is not None:
-            return pygame.transform.smoothscale(self.base_image, (self._width, self._height))
+            return pygame.transform.smoothscale(
+                self.base_image, (self._width, self._height)
+            )
 
         if self._scale != 1.0:
             bw, bh = self.base_image.get_size()
@@ -87,8 +93,14 @@ class Image:
 
     def setImage(self, image_name: str) -> None:
         self.image_name = image_name
-        self.base_image = pygame.image.load(self.path_prefix + self.image_name).convert_alpha()
+
+        self.base_image = pygame.image.load(
+            self.path_prefix + self.image_name
+        ).convert_alpha()
+
         self.image = self._build_image()
+        self._original_image = self.image.copy()
+
         old_center = self.imageRect.center
         self.imageRect = self.image.get_rect(center=old_center)
 
@@ -101,64 +113,27 @@ class Image:
     def setMoveSpeed(self, speed: float) -> None:
         self.move_speed = speed
 
+    @staticmethod
+    def to_grayscale(image: pygame.Surface) -> pygame.Surface:
+        grayscale = pygame.Surface(image.get_size(), pygame.SRCALPHA)
 
+        arr = pygame.surfarray.pixels3d(image).copy()
+        gray = (0.299 * arr[:, :, 0] + 0.587 * arr[:, :, 1] + 0.114 * arr[:, :, 2]).astype("uint8")
 
+        arr2 = pygame.surfarray.pixels3d(grayscale)
+        arr2[:, :, 0] = gray
+        arr2[:, :, 1] = gray
+        arr2[:, :, 2] = gray
 
+        alpha = pygame.surfarray.pixels_alpha(image)
+        pygame.surfarray.pixels_alpha(grayscale)[:, :] = alpha
 
-# import pygame
-# from typing import Callable
-# from src.utils.constants import PATH_UI, PATH_PORTRAITS, PATH_CARDS, PATH_BACKGROUNDS
+        return grayscale
 
-# class Image:
-#     def __init__(
-#         self,
-#         x: int,
-#         y: int,
-#         image_name: str,
-#         path_prefix: str = PATH_UI,
-#         callback: Callable = None,
-#         enable: bool = True,
-#         width: int = None,
-#         height: int = None,
-#         scale: float = 1.0,
-#         target: tuple = None
-#     ):
+    def makeGray(self):
+        self.image = Image.to_grayscale(self._original_image)
+        self.imageRect = self.image.get_rect(center=self.imageRect.center)
 
-#         self.target = target
-
-#         self.image_name = image_name
-#         self.path_prefix = path_prefix
-
-#         self.base_image = pygame.image.load(path_prefix + self.image_name).convert_alpha()
-
-#         if width is not None and height is not None:
-#             self.image = pygame.transform.smoothscale(self.base_image, (width, height))
-#         elif scale != 1.0:
-#             bw, bh = self.base_image.get_size()
-#             new_w = int(bw * scale)
-#             new_h = int(bh * scale)
-#             self.image = pygame.transform.smoothscale(self.base_image, (new_w, new_h))
-#         else:
-#             self.image = self.base_image.copy()
-
-#         self.center = (x, y)
-#         self.imageRect = self.image.get_rect(center=self.center)
-
-#         self.callback = callback
-#         self.enable = enable
-
-#     def handleEvent(self, event: pygame.event.Event) -> None:
-#         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.enable:
-#             if self.imageRect.collidepoint(event.pos):
-#                 if callable(self.callback):
-#                     self.callback()
-
-#     def render(self, screen: pygame.Surface) -> None:
-#         if self.enable:
-#             screen.blit(self.image, self.imageRect)
-
-#     def setImage(self, image: str) -> None:
-#         self.image_name = image
-
-#     def setEnable(self, enable: bool):
-#         self.enable = enable
+    def resetColor(self):
+        self.image = self._original_image.copy()
+        self.imageRect = self.image.get_rect(center=self.imageRect.center)

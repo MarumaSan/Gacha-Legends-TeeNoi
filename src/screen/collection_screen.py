@@ -29,32 +29,61 @@ class Collection(BaseScreen):
         self.textDisplays = [
             TextDisplay(
                 x= self.center_x - 180,
-                y= 500,
-                text= 'NAME',
+                y= 100,
+                text= 'NAME1',
                 size= 18,
                 color= COLOR_BLACK
             ),
             TextDisplay(
                 x= self.center_x + 180,
-                y= 500,
-                text= 'NAME',
+                y= 100,
+                text= 'NAME2',
                 size= 18,
                 color= COLOR_BLACK
+            ),
+            TextDisplay(
+                x= self.center_x - 180,
+                y= 500,
+                text= 'STATE1',
+                size= 14,
+                color= COLOR_BLACK
+            ),
+            TextDisplay(
+                x= self.center_x + 180,
+                y= 500,
+                text= 'STATE2',
+                size= 14,
+                color= COLOR_BLACK
+            ),
+            TextDisplay(
+                x= self.center_x - 180,
+                y= 530,
+                text= 'TOTAL1',
+                size= 14,
+                color= COLOR_BLACK
+            ),
+            TextDisplay(
+                x= self.center_x + 180,
+                y= 530,
+                text= 'TOTAL2',
+                size= 14,
+                color= COLOR_BLACK
             )
+
 
         ]
 
         self.images = [
             Image(
                 x= self.center_x - 180,
-                y= self.center_y - 70,
+                y= self.center_y - 55,
                 image_name= 'hero1.png',
                 path_prefix= PATH_PORTRAITS,
                 scale= 0.45
             ),
             Image(
                 x= self.center_x + 180,
-                y= self.center_y - 70,
+                y= self.center_y - 55,
                 image_name= 'hero2.png',
                 path_prefix= PATH_PORTRAITS,
                 scale= 0.45
@@ -115,9 +144,6 @@ class Collection(BaseScreen):
         self.update_page()
 
     def backward(self):
-        if self.page == ceil(len(CHARACTER) / 2):
-            self.images[1].setEnable(True)
-            self.textDisplays[1].setEnable(True)
         self.page -= 1
         self.update_page()
 
@@ -126,18 +152,39 @@ class Collection(BaseScreen):
         self.update_page()
 
     def update_page(self):
-        self.page = max(1, min(ceil(len(CHARACTER) / 2), self.page))
+        last_page = (len(CHARACTER) + 1) // 2
+        self.page = max(1, min(last_page, self.page))
 
-        image1 = f'hero{(2 * self.page) - 1}.png'
-        character1_name = f'{CHARACTER[(2 * self.page) - 2].name}'
-        self.images[0].setImage(image1)
-        self.textDisplays[0].setText(character1_name)
+        owned = set(self.manager.player_data.owned_characters)
 
-        if self.page != ceil(len(CHARACTER) / 2):
-            image2 = f'hero{(2 * self.page)}.png'
-            self.images[1].setImage(image2)
-            character2_name = f'{CHARACTER[(2 * self.page) - 1].name}'
-            self.textDisplays[1].setText(character2_name)
-        else:
-            self.images[1].setEnable(False)
-            self.textDisplays[1].setEnable(False)
+        start_idx = (self.page - 1) * 2
+
+        for slot in range(2):
+            idx = start_idx + slot
+            img = self.images[slot]
+            character_name = self.textDisplays[slot]
+            character_state = self.textDisplays[slot + 2]
+            character_totalpower = self.textDisplays[slot + 4]
+
+
+            if idx < len(CHARACTER):
+                img.setEnable(True)
+                character_name.setEnable(True)
+
+                img.setImage(f"hero{idx + 1}.png")
+                character_name.setText(CHARACTER[idx].name)
+                character_state.setText(f'ATK [{CHARACTER[idx].atk}] | DEF [{CHARACTER[idx].defense}]')
+                character_totalpower.setText(f'TOTAL POWER [{CHARACTER[idx].totalPower}]')
+
+
+                if (idx + 1) not in owned:
+                    img.makeGray()
+                    character_name.setText('???')
+                    character_state.setText(f'ATK [???] | DEF [???]')
+                    character_totalpower.setText(f'TOTAL POWER [???]')
+                else:
+                    if hasattr(img, "resetColor"):
+                        img.resetColor()
+            else:
+                img.setEnable(False)
+                character_name.setEnable(False)
