@@ -9,6 +9,8 @@ from src.screen.lobby_screen import LobbyScreen
 from src.screen.setting_screen import SettingScreen
 from src.screen.profile_screen import ProfileScreen
 from src.screen.collection_screen import Collection
+from src.screen.gacha_screen import GachaScreen
+from src.screen.redeem_screen import RedeemScreen
 
 
 class GameManager:
@@ -45,7 +47,7 @@ class GameManager:
 
         self.loadScreen()
 
-        self.screenManager.changeScreen('collection')
+        self.screenManager.changeScreen('redeem')
 
         self.helpers = Helpers(self)
 
@@ -84,6 +86,8 @@ class GameManager:
         self.screenManager.loadScreen('setting', SettingScreen(self))
         self.screenManager.loadScreen('profile', ProfileScreen(self))
         self.screenManager.loadScreen('collection', Collection(self))
+        self.screenManager.loadScreen('gacha', GachaScreen(self))
+        self.screenManager.loadScreen('redeem', RedeemScreen(self))
 
     def selectPlayer(self, player: str) -> PlayerData:
         self.current_player_id = player

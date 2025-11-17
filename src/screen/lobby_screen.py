@@ -105,7 +105,7 @@ class LobbyScreen(BaseScreen):
                 button.handleEvent(event)
 
     def _redeemCodeScreen(self):
-        print('redeem Code')
+        self.manager.screenManager.changeScreen('redeem')
 
     def _profileScreen(self):
         self.manager.screenManager.changeScreen('profile')
@@ -114,7 +114,7 @@ class LobbyScreen(BaseScreen):
         self.manager.screenManager.changeScreen('setting')
     
     def _mysticChest(self):
-        print('mystic chest')
+        self.manager.screenManager.changeScreen('gacha')
 
     def _celestialChest(self):
         print('celestial chest')
