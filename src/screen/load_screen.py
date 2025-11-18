@@ -114,9 +114,9 @@ class LoadScreen(BaseScreen):
                     self.buttons[0].setEnable(True)
                     self.buttons[1].setEnable(True)
             
-            for button in self.buttons:
-                if self.images[0].imageRect.centerx == self.images[0].target[0]:
-                    button.handleEvent(event)
+            if self.images[0].imageRect.centerx == self.images[0].target[0]:
+                if self._dispatch_event(self.buttons, event):
+                    continue
     
     def update(self):
         if self.animating:

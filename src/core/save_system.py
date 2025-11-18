@@ -1,18 +1,19 @@
 import json
 from src.utils.constants import PATH_SAVE
 from typing import Optional, Any
+from src.model.player_data import PlayerData
 
 class SaveSystem:
     def __init__(self, player: str):
         self.save_path = f'{PATH_SAVE}save_data_{player}.json'
     
-    def save_game(self, player_data: Any) -> bool:
+    def save_game(self, player_data: PlayerData | Any) -> bool:
         try:
             save_data = {
                 "coins": player_data.coins,
                 "owned_characters": list(player_data.owned_characters),
                 "setting": player_data.setting,
-                "rank": player_data.rank,
+                "win": player_data.win,
                 "used_codes": list(player_data.used_codes)
             }
 
@@ -34,7 +35,7 @@ class SaveSystem:
                 "coins",
                 "owned_characters",
                 "setting",
-                "rank",
+                "win",
                 "used_codes"
             ]
             
@@ -55,7 +56,7 @@ class SaveSystem:
             "coins": 1000,
             "owned_characters": set(),
             "setting": {"volume": 0},
-            "rank": 0,
+            "win": 0,
             "used_codes": set()
         }
         

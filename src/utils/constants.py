@@ -8,6 +8,7 @@ COLOR_WHITE = (255, 255, 255)
 COLOR_PURPLE = (203, 108, 230)
 COLOR_YELLOW = (228, 162, 31)
 COLOR_BLACK = (0, 0, 0)
+COLOR_RED = (255,82,82)
 
 PATH_BACKGROUNDS = 'assets/backgrounds/'
 PATH_CARDS = 'assets/cards/'

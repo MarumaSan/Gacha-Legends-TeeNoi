@@ -40,11 +40,14 @@ class Button:
                 
         self.enable = enable
 
-    def handleEvent(self, event: pygame.event.Event) -> None:
+    def handleEvent(self, event: pygame.event.Event) -> bool:
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.enable:
             if self.imageRect.collidepoint(event.pos):
                 if callable(self.callback):
                     self.callback()
+                    return True
+                return False
+        return False
 
     def render(self, screen: pygame.Surface) -> None:
         if self.enable:

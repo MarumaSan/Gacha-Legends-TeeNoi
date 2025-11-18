@@ -1,11 +1,12 @@
 {
-  "coins": 88888,
-  "owned_characters": [],
+  "coins": 0,
+  "owned_characters": [
+    2,
+    14
+  ],
   "setting": {
-    "volume": 0.04
+    "volume": 0
   },
-  "rank": 0,
-  "used_codes": [
-    "MRM888"
-  ]
+  "win": 0,
+  "used_codes": []
 }

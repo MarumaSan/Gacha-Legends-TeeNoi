@@ -98,11 +98,10 @@ class LobbyScreen(BaseScreen):
 
     def handleEvents(self, events: list[pygame.event.Event]) -> None:
         for event in events:
-            for button in self.statusButtons:
-                button.handleEvent(event)
+            if self._dispatch_event(self.statusButtons, event):
+                continue
             
-            for button in self.chestButtons:
-                button.handleEvent(event)
+            self._dispatch_event(self.chestButtons, event)
 
     def _redeemCodeScreen(self):
         self.manager.screenManager.changeScreen('redeem')

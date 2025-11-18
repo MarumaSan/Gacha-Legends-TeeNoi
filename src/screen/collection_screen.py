@@ -132,8 +132,8 @@ class Collection(BaseScreen):
 
     def handleEvents(self, events: list[pygame.event.Event]) -> None:
         for event in events:
-            for button in self.buttons:
-                button.handleEvent(event)
+            if self._dispatch_event(self.buttons, event):
+                continue
 
     def backToLobby(self):
         self.manager.screenManager.changeScreen('lobby')
@@ -172,7 +172,7 @@ class Collection(BaseScreen):
                 character_name.setEnable(True)
 
                 img.setImage(f"hero{idx + 1}.png")
-                character_name.setText(CHARACTER[idx].name)
+                character_name.setText(f'{CHARACTER[idx].name} [{CHARACTER[idx].rarity.upper()}]')
                 character_state.setText(f'ATK [{CHARACTER[idx].atk}] | DEF [{CHARACTER[idx].defense}]')
                 character_totalpower.setText(f'TOTAL POWER [{CHARACTER[idx].totalPower}]')
 

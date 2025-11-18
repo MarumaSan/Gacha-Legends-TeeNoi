@@ -61,9 +61,8 @@ class SettingScreen(BaseScreen):
 
     def handleEvents(self, events: list[pygame.event.Event]) -> None:
         for event in events:
-            self.saveButton.handleEvent(event)
-
-            self.button.handleEvent(event)
+            if self._dispatch_event((self.saveButton, self.button), event):
+                continue
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if self.sliderButton.imageRect.collidepoint(event.pos):

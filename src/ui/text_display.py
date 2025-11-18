@@ -45,11 +45,14 @@ class TextDisplay:
 
         self.setText(self.text)
 
-    def handleEvent(self, event: pygame.event.Event) -> None:
+    def handleEvent(self, event: pygame.event.Event) -> bool:
         if not self.enable:
-            return
+            return False
 
-        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.enable:
             if self.textRect.collidepoint(event.pos):
                 if callable(self.callback):
                     self.callback()
+                    return True
+                return False
+        return False

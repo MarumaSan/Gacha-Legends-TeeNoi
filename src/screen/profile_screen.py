@@ -165,8 +165,8 @@ class ProfileScreen(BaseScreen):
 
     def handleEvents(self, events: list[pygame.event.Event]) -> None:
         for event in events:
-            for button in self.buttons:
-                button.handleEvent(event)
+            if self._dispatch_event(self.buttons, event):
+                continue
 
     def backToLobby(self):
         self.manager.screenManager.changeScreen('lobby')

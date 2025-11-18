@@ -1,7 +1,18 @@
 from math import sqrt, pow
 
 class Character:
-    def __init__(self, id: int, name: str, rarity: str, atk: int, defense: int, portrait_path: str, card_front_path: str, card_back_path: str):
+    def __init__(
+            self,
+            id: int, 
+            name: str, 
+            rarity: str, 
+            atk: int, 
+            defense: int, 
+            portrait_path: str, 
+            card_front_path: str, 
+            card_back_path: str
+        ):
+        
         self.id = id
         self.name = name
         self.rarity = rarity

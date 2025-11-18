@@ -49,7 +49,7 @@ class GameManager:
 
         self.loadScreen()
 
-        self.screenManager.changeScreen('gacha')
+        self.screenManager.changeScreen('load')
 
         self.helpers = Helpers(self)
 
@@ -109,7 +109,7 @@ class GameManager:
                 coins=save_data["coins"],
                 owned_characters=save_data["owned_characters"],
                 setting=save_data["setting"],
-                rank=save_data["rank"],
+                win=save_data["win"],
                 used_codes=save_data["used_codes"]
             )
         
@@ -118,8 +118,16 @@ class GameManager:
             coins=default_data["coins"],
             owned_characters=default_data["owned_characters"],
             setting=default_data["setting"],
-            rank=default_data["rank"],
+            win=default_data["win"],
             used_codes=default_data["used_codes"]
         )
         save_system.save_game(player_data)
         return player_data
+
+    def quit_game(self) -> None:
+            save_success = self.save_systems[self.current_player_id].save_game(self.player_data)
+            
+            if not save_success:
+                print("Warning: Failed to save game data before quitting")
+            
+            self.running = False

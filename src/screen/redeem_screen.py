@@ -99,9 +99,6 @@ class RedeemScreen(BaseScreen):
 
     def handleEvents(self, events: list[pygame.event.Event]) -> None:
         for event in events:
-            for button in self.buttons:
-                button.handleEvent(event)
-
             if self.input_box.handle_event(event) == "SUBMIT":
                 if self.input_box.submit_text in self.redeem_code :
                     if self.manager.player_data.use_code(self.input_box.submit_text, REDEEM_CODES[self.input_box.submit_text]):
@@ -109,6 +106,10 @@ class RedeemScreen(BaseScreen):
                         self.textDisplays[2].setEnable(True)
                         self.textDisplays[2].setText(f'+ {REDEEM_CODES[self.input_box.submit_text]}')
                         self.manager.save_systems[self.manager.current_player_id].save_game(self.manager.player_data)
+                continue
+
+            if self._dispatch_event(self.buttons, event):
+                continue
                 
 
     def start_screen(self):

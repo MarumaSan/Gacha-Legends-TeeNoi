@@ -59,3 +59,13 @@ class BaseScreen:
                 self.fade_alpha = 255
                 self.transitioning = False
                 self.transition_phase = None
+
+    def _dispatch_event(self, targets, event: pygame.event.Event) -> bool:
+        """
+        Send an event to a list of UI objects and stop once one consumes it.
+        """
+        for target in targets:
+            handler = getattr(target, "handleEvent", None)
+            if callable(handler) and handler(event):
+                return True
+        return False

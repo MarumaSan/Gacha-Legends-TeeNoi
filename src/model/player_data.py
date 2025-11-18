@@ -7,7 +7,7 @@ class PlayerData:
     coins: int = 1000
     owned_characters: set[str] = field(default_factory=set)
     setting: dict = field(default_factory=lambda: {"volume": 0})
-    rank: int = 0
+    win: int = 0
     used_codes: set[str] = field(default_factory=set)
 
     def add_character(self, character: Character) -> None:
@@ -22,8 +22,8 @@ class PlayerData:
         self.coins += amount
         return True
     
-    def setRank(self, rank: int) -> None:
-        self.rank = rank
+    def addWin(self, win: int) -> None:
+        self.win += win
 
     def setVolume(self, volume_percent) -> None:
         self.setting['volume'] = volume_percent

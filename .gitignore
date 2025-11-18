@@ -19,6 +19,7 @@ dist/
 # Other
 template.py
 game_manager_copy.py
+gacha_screen copy.py
 
 
 # self.manager.player_data.add_character(CHARACTER[1])

@@ -1,9 +1,12 @@
 {
   "coins": 0,
-  "owned_characters": [],
+  "owned_characters": [
+    2,
+    3
+  ],
   "setting": {
-    "volume": 0.05
+    "volume": 0.0
   },
-  "rank": 0,
+  "win": 0,
   "used_codes": []
 }
