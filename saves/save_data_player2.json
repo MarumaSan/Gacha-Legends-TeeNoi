@@ -1,24 +1,11 @@
 {
-  "coins": 5699,
-  "owned_characters": [
-    1,
-    2,
-    3,
-    4,
-    5,
-    6,
-    7,
-    8,
-    9,
-    10,
-    11,
-    12,
-    13,
-    14
-  ],
+  "coins": 88888,
+  "owned_characters": [],
   "setting": {
     "volume": 0.04
   },
   "rank": 0,
-  "used_codes": []
+  "used_codes": [
+    "MRM888"
+  ]
 }

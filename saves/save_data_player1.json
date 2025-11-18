@@ -1,13 +1,9 @@
 {
-  "coins": 15999,
-  "owned_characters": [
-    1
-  ],
+  "coins": 0,
+  "owned_characters": [],
   "setting": {
     "volume": 0.05
   },
   "rank": 0,
-  "used_codes": [
-    "BABOSS"
-  ]
+  "used_codes": []
 }
