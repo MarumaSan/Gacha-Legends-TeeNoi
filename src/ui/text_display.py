@@ -35,10 +35,10 @@ class TextDisplay:
 
     def setText(self, text: str) -> None:
         self.text = text
-        if self.text:
-            self.font = pygame.font.Font(PATH_FONTS + 'Monocraft.ttf', self.size)
-            self.textSurface = self.font.render(self.text, True, self.color)
-            self.textRect = self.textSurface.get_rect(centerx = self.x, centery = self.y)
+        self.font = pygame.font.Font(PATH_FONTS + 'Monocraft.ttf', self.size)
+        render_text = self.text if self.text else ''
+        self.textSurface = self.font.render(render_text, True, self.color)
+        self.textRect = self.textSurface.get_rect(centerx=self.x, centery=self.y)
 
     def setColor(self, color):
         self.color = color

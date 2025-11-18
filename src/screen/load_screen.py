@@ -80,6 +80,13 @@ class LoadScreen(BaseScreen):
                 image_name= 'player2.png',
                 enable= False,
                 callback= self.player2
+            ),
+            Button(
+                x= self.center_x,
+                y= 620,
+                image_name= 'battle_button.png',
+                callback= self._battleScreen,
+                enable= False
             )
         ]
     
@@ -107,6 +114,7 @@ class LoadScreen(BaseScreen):
                     self.textDisplays[2].setEnable(True)
                     self.buttons[0].setEnable(True)
                     self.buttons[1].setEnable(True)
+                    self.buttons[2].setEnable(True)
             
             if self.images[0].imageRect.centerx == self.images[0].target[0]:
                 if self._dispatch_event(self.buttons, event):
@@ -148,3 +156,6 @@ class LoadScreen(BaseScreen):
         self.manager.selectPlayer('player2')
         self.manager.screenManager.changeScreen('lobby')
         pygame.mixer.music.set_volume(self.manager.player_data.setting['volume'])
+
+    def _battleScreen(self):
+        self.manager.screenManager.changeScreen('battle')

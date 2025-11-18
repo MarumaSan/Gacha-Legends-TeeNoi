@@ -13,7 +13,6 @@ from src.screen.gacha_screen import GachaScreen
 from src.screen.redeem_screen import RedeemScreen
 from src.screen.battle_screen import BattleScreen
 
-
 class GameManager:
     def __init__(self):
         pygame.init()
@@ -50,7 +49,7 @@ class GameManager:
 
         self.loadScreen()
 
-        self.screenManager.changeScreen('battle')
+        self.screenManager.changeScreen('load')
 
         self.helpers = Helpers(self)
 

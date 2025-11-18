@@ -1,9 +1,21 @@
 {
-  "coins": 1000,
-  "owned_characters": [],
+  "coins": 5249,
+  "owned_characters": [
+    1,
+    5,
+    7,
+    8,
+    10,
+    12,
+    14,
+    15,
+    17
+  ],
   "setting": {
     "volume": 0
   },
-  "win": 0,
-  "used_codes": []
+  "win": 12,
+  "used_codes": [
+    "BABOSS"
+  ]
 }
