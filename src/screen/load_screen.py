@@ -68,22 +68,16 @@ class LoadScreen(BaseScreen):
 
         self.buttons = [
             Button(
-                x= self.center_x - 125,
+                x= self.center_x - 115,
                 y= self.center_y,
-                image_name= 'wood1_background.png',
-                text= 'player 1',
-                font_size= 16,
-                text_color = COLOR_YELLOW,
+                image_name= 'player1.png',
                 enable= False,
                 callback= self.player1
             ),
             Button(
-                x= self.center_x + 125,
+                x= self.center_x + 115,
                 y= self.center_y,
-                image_name= 'wood1_background.png',
-                text= 'player 2',
-                font_size= 16,
-                text_color = COLOR_YELLOW,
+                image_name= 'player2.png',
                 enable= False,
                 callback= self.player2
             )

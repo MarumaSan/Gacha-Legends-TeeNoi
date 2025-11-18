@@ -44,18 +44,15 @@ class SettingScreen(BaseScreen):
 
         self.saveButton = Button(
             x= self.center_x,
-            y= 660,
+            y= 450,
             image_name= 'save_button.png',
             callback= self._backToLobby
         )
 
         self.button = Button(
                 x= self.center_x,
-                y= 470,
-                image_name= 'wood1_background.png',
-                font_size= 16,
-                text= 'Logout',
-                text_color= COLOR_YELLOW,
+                y= 660,
+                image_name= 'logout.png',
                 callback= self._backToLoad
             )
 
