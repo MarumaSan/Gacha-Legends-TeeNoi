@@ -1,11 +1,8 @@
 {
-  "coins": 0,
-  "owned_characters": [
-    2,
-    3
-  ],
+  "coins": 1000,
+  "owned_characters": [],
   "setting": {
-    "volume": 0.0
+    "volume": 0
   },
   "win": 0,
   "used_codes": []
