@@ -1,0 +1,30 @@
+# Ignore ALL __pycache__ folders everywhere
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+**/*.pyd
+
+# Pygame temp/cache
+**/*.cache
+**/*.tmp
+
+# macOS
+.DS_Store
+
+# Editor settings
+.vscode/
+.idea/
+
+# Python environments
+venv/
+.env/
+
+# Build/dist
+build/
+dist/
+
+# Other
+template.py
+
+# self.manager.player_data.add_character(CHARACTER[1])
+# self.manager.save_systems[self.manager.current_player_id].save_game(self.manager.player_data)
