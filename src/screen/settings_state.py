@@ -67,7 +67,7 @@ class SettingsState(GameState):
         center_y = SCREEN_HEIGHT // 2
         
         # ดึงค่า volume เริ่มต้น (ถ้ามี player_data)
-        initial_volume = 50  # ค่าเริ่มต้น
+        initial_volume = 10  # ค่าเริ่มต้น
         if hasattr(self.game, 'player_data') and self.game.player_data:
             initial_volume = self.game.player_data['settings'].get('volume', 50)
         self.on_sound_change(initial_volume)
