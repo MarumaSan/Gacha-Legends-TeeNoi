@@ -8,36 +8,36 @@ import os
 from pathlib import Path
 
 
-# # โค้ดเริ่มต้น
-# DEFAULT_CODES = {
-#     "WELCOME2024": {"coins": 500, "description": "Welcome bonus"},
-#     "HERO100": {"coins": 100, "description": "Starter pack"},
-#     "LUCKY777": {"coins": 777, "description": "Lucky bonus"},
-#     "GACHA1000": {"coins": 1000, "description": "Premium bonus"},
-#     "FREEGEMS": {"coins": 250, "description": "Free gems"}
-# }
+# โค้ดเริ่มต้น
+DEFAULT_CODES = {
+    "WELCOME2024": {"coins": 500, "description": "Welcome bonus"},
+    "HERO100": {"coins": 100, "description": "Starter pack"},
+    "LUCKY777": {"coins": 777, "description": "Lucky bonus"},
+    "GACHA1000": {"coins": 1000, "description": "Premium bonus"},
+    "FREEGEMS": {"coins": 250, "description": "Free gems"}
+}
 
 
-# def load_available_codes():
-#     """
-#     โหลดโค้ดที่มีทั้งหมด
+def load_available_codes():
+    """
+    โหลดโค้ดที่มีทั้งหมด
     
-#     Returns:
-#         dict: โค้ดทั้งหมด
-#     """
-#     filepath = "data/json/codes.json"
+    Returns:
+        dict: โค้ดทั้งหมด
+    """
+    filepath = "data/json/codes.json"
     
-#     if not os.path.exists(filepath):
-#         # สร้างไฟล์ใหม่ด้วยโค้ดเริ่มต้น
-#         save_available_codes(DEFAULT_CODES)
-#         return DEFAULT_CODES.copy()
+    if not os.path.exists(filepath):
+        # สร้างไฟล์ใหม่ด้วยโค้ดเริ่มต้น
+        save_available_codes(DEFAULT_CODES)
+        return DEFAULT_CODES.copy()
     
-#     try:
-#         with open(filepath, 'r') as f:
-#             return json.load(f)
-#     except Exception as e:
-#         print(f"Error loading codes: {e}")
-#         return DEFAULT_CODES.copy()
+    try:
+        with open(filepath, 'r') as f:
+            return json.load(f)
+    except Exception as e:
+        print(f"Error loading codes: {e}")
+        return DEFAULT_CODES.copy()
 
 
 def save_available_codes(codes):
