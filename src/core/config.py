@@ -3,6 +3,7 @@ SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 720
 FPS = 60
 GAME_TITLE = "Gacha Legends: Tee Noi Edition"
+GAME_LOGO_PATH = 'assets/ui/logo.png'
 
 # สี
 COLOR_WHITE = (255, 255, 255)

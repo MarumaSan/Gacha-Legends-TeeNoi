@@ -3,7 +3,7 @@
 import pygame
 import sys
 from src.core.state_manager import StateManager
-from src.core.config import SCREEN_WIDTH, SCREEN_HEIGHT, FPS, GAME_TITLE
+from src.core.config import SCREEN_WIDTH, SCREEN_HEIGHT, FPS, GAME_TITLE, GAME_LOGO_PATH
 
 
 class Game:
@@ -14,6 +14,8 @@ class Game:
         pygame.mixer.init()
         self.screen = pygame.display.set_mode((width, height))
         pygame.display.set_caption(GAME_TITLE)
+        self.logo = pygame.image.load(GAME_LOGO_PATH)
+        pygame.display.set_icon(self.logo)
 
         self.clock = pygame.time.Clock()
         self.running = False
@@ -50,9 +52,9 @@ class Game:
         self.current_player_slot = player_slot
         
         # โหลดข้อมูลผู้เล่น (เป็น dict)
-        self.player_data = player.load_player_data(player_slot)
+        self.player_data: list[player] = player.load_player_data(player_slot)
         
-        print(f"โหลดข้อมูล Player {player_slot} สำเร็จ")
+        print(f"Load Player {player_slot} Successfully")
         
         # โหลดและเล่นเพลง (ครั้งแรกหลังจากเลือกผู้เล่น)
         if not self.music_loaded:

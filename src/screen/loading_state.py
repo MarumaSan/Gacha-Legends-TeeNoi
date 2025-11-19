@@ -2,82 +2,17 @@ import pygame
 from src.core.game_state import GameState
 from src.utils import assets
 from src.core.config import SCREEN_WIDTH, SCREEN_HEIGHT
+from src.ui.image_button import _ImageButton
+from src.ui.text_display import TextDisplay
 
-
-def _color_effect(src: pygame.Surface, mul=(230, 230, 230, 255)) -> pygame.Surface:
-    img = src.copy()
-    img.fill(mul, special_flags=pygame.BLEND_RGBA_MULT)
-    return img
-
-
-class _ImageButton:
-    def __init__(self, base_img: pygame.Surface, center, on_click=None, scale=1.2, use_mask=True, text="", font=None):
-        if scale != 1.0:
-            w, h = base_img.get_size()
-            base_img = pygame.transform.smoothscale(base_img, (int(w * scale), int(h * scale)))
-
-        self.normal = base_img
-        self.hover = _color_effect(base_img, (230, 240, 245, 255))
-        self.down = _color_effect(base_img, (200, 200, 200, 255))
-
-        self.image = self.normal
-        self.rect = self.image.get_rect(center=center)
-
-        self.on_click = on_click
-        self._held = False
-        self._over = False
-
-        self.use_mask = use_mask
-        self.mask = pygame.mask.from_surface(self.image) if use_mask else None
-
-        self.text = text
-        self.font = font
-        self.text_color = (255, 255, 255)
-
-    def _hit(self, pos):
-        if not self.rect.collidepoint(pos):
-            return False
-        if not self.use_mask:
-            return True
-        lx, ly = pos[0] - self.rect.x, pos[1] - self.rect.y
-        return bool(self.mask.get_at((lx, ly)))
-
-    def handle_event(self, event):
-        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-            if self._hit(event.pos):
-                self._held = True
-        elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
-            if self._held and self._hit(event.pos):
-                if self.on_click:
-                    self.on_click()
-            self._held = False
-
-    def update(self, dt):
-        mpos = pygame.mouse.get_pos()
-        self._over = self._hit(mpos)
-
-        if self._over and self._held:
-            self.image = self.down
-        elif self._over:
-            self.image = self.hover
-        else:
-            self.image = self.normal
-
-    def draw(self, surf):
-        shadow = pygame.Surface(self.rect.size, pygame.SRCALPHA)
-        pygame.draw.ellipse(shadow, (0, 0, 0, 60),
-                            (0, int(self.rect.height * 0.75), self.rect.width, int(self.rect.height * 0.5)))
-        surf.blit(shadow, (self.rect.x, self.rect.y))
-        surf.blit(self.image, self.rect)
-
-        if self.text and self.font:
-            label = self.font.render(self.text, True, self.text_color)
-            surf.blit(label, label.get_rect(center=self.rect.center))
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from src.core.game import Game
 
 
 class LoadingState(GameState):
     """Loading screen state with player selection (PLAYER 1, PLAYER 2, QUIT)"""
-    def __init__(self, game):
+    def __init__(self, game: 'Game'):
         super().__init__(game)
         self.background = None
         self.font = None
@@ -102,42 +37,78 @@ class LoadingState(GameState):
             self.background = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
             self.background.fill((50, 50, 100))
 
-        try:
-            self.font = assets.load_font('assets/fonts/Monocraft.ttf', 15)
-        except Exception as e:
-            print(f"โหลดฟอนต์ไม่ได้: {e}")
-            self.font = pygame.font.Font(None, 15)
+        self.font = assets.load_font('assets/fonts/Monocraft.ttf', 60)
+        self.title_player_select = TextDisplay(
+            'Select Player',
+            self.font,
+            (228, 162, 31),
+            centered=True,
+            position=(SCREEN_WIDTH // 2, 200)
+        )
 
         try:
             base_img = assets.load_image(self.BUTTON_BASE_PATH).convert_alpha()
+            btn_player1 = assets.load_image('assets/ui/player1.png').convert_alpha()
+            btn_player2 = assets.load_image('assets/ui/player2.png').convert_alpha()
+            img_character1 = assets.load_image('assets/portraits/hero21.png').convert_alpha()
+            img_character2 = assets.load_image('assets/portraits/hero17.png').convert_alpha()
+            Btn_battle = assets.load_image('assets/ui/battle_button.png').convert_alpha()
+
         except Exception as e:
-            print(f"โหลดภาพปุ่มไม่ได้: {e}")
-            base_img = pygame.Surface((220, 70), pygame.SRCALPHA)
-            base_img.fill((60, 60, 90, 255))
-            pygame.draw.rect(base_img, (255, 255, 255, 40), base_img.get_rect(), border_radius=16)
+            print(f"Error: {e}")
 
         centers = [
-            (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 120),
-            (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 40),
-            (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 40),
-            (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 120),
+            (SCREEN_WIDTH // 2 - 70, SCREEN_HEIGHT // 2 - 40),
+            (SCREEN_WIDTH // 2 + 70, SCREEN_HEIGHT // 2 - 40),
+            (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 80),
+            (SCREEN_WIDTH // 2, 680),
+            (200, SCREEN_HEIGHT // 2),
+            (1080, SCREEN_HEIGHT // 2)
         ]
 
         self.btn_player1 = _ImageButton(
-            base_img, centers[0], on_click=self.on_player1_click,
-            scale=self.BUTTON_SCALE, use_mask=True, text="PLAYER 1", font=self.font
+            btn_player1, 
+            centers[0], 
+            on_click=self.on_player1_click,
+            scale=0.8, 
+            use_mask=True, 
         )
         self.btn_player2 = _ImageButton(
-            base_img, centers[1], on_click=self.on_player2_click,
-            scale=self.BUTTON_SCALE, use_mask=True, text="PLAYER 2", font=self.font
+            btn_player2, 
+            centers[1], 
+            on_click=self.on_player2_click,
+            scale=0.8, 
+            use_mask=True, 
         )
         self.btn_battle = _ImageButton(
-            base_img, centers[2], on_click=self.on_battle_click,
-            scale=self.BUTTON_SCALE, use_mask=True, text="BATTLE", font=self.font
+            Btn_battle, 
+            centers[2], 
+            on_click=self.on_battle_click,
+            scale=0.8, 
+            use_mask=True,
         )
-        self.btn_quit = _ImageButton(
-            base_img, centers[3], on_click=self.on_exit_click,
-            scale=self.BUTTON_SCALE, use_mask=True, text="QUIT", font=self.font
+        # self.btn_quit = _ImageButton(
+        #     base_img, 
+        #     centers[3], 
+        #     on_click=self.on_exit_click,
+        #     scale=self.BUTTON_SCALE, 
+        #     use_mask=True, 
+        #     text="QUIT", 
+        #     font=self.font
+        # )
+
+        self.img_character1 = _ImageButton(
+            img_character1,
+            centers[4],
+            scale=0.5,
+            use_mask=True
+        )
+
+        self.img_character2 = _ImageButton(
+            img_character2,
+            centers[5],
+            scale=0.5,
+            use_mask=True
         )
         
         # โหลดรูปปุ่ม question
@@ -163,7 +134,7 @@ class LoadingState(GameState):
     def on_player1_click(self):
         if getattr(self.game.state_manager, "transitioning", False):
             return
-        print("เลือก PLAYER 1")
+        print("Select PLAYER 1")
         # โหลดข้อมูลผู้เล่น 1
         self.game.load_player_data(1)
         # เข้าเกม
@@ -175,7 +146,7 @@ class LoadingState(GameState):
     def on_player2_click(self):
         if getattr(self.game.state_manager, "transitioning", False):
             return
-        print("เลือก PLAYER 2")
+        print("Select PLAYER 2")
         # โหลดข้อมูลผู้เล่น 2
         self.game.load_player_data(2)
         # เข้าเกม
@@ -193,11 +164,11 @@ class LoadingState(GameState):
         else:
             self.game.change_state('battle')
     
-    def on_exit_click(self):
-        if getattr(self.game.state_manager, "transitioning", False):
-            return
-        print("คลิกปุ่มออกเกม")
-        self.game.quit()
+    # def on_exit_click(self):
+    #     if getattr(self.game.state_manager, "transitioning", False):
+    #         return
+    #     print("คลิกปุ่มออกเกม")
+    #     self.game.quit()
     
     def on_question_click(self):
         if getattr(self.game.state_manager, "transitioning", False):
@@ -211,7 +182,7 @@ class LoadingState(GameState):
         if self.btn_player1: self.btn_player1.handle_event(event)
         if self.btn_player2: self.btn_player2.handle_event(event)
         if self.btn_battle: self.btn_battle.handle_event(event)
-        if self.btn_quit: self.btn_quit.handle_event(event)
+        # if self.btn_quit: self.btn_quit.handle_event(event)
         if self.btn_question: self.btn_question.handle_event(event)
 
     def update(self, dt):
@@ -228,11 +199,14 @@ class LoadingState(GameState):
             screen.blit(self.background, (0, 0))
         else:
             screen.fill((30, 30, 60))
+        if self.title_player_select: self.title_player_select.draw(screen)
         if self.btn_player1: self.btn_player1.draw(screen)
         if self.btn_player2: self.btn_player2.draw(screen)
         if self.btn_battle: self.btn_battle.draw(screen)
-        if self.btn_quit: self.btn_quit.draw(screen)
+        # if self.btn_quit: self.btn_quit.draw(screen)
         if self.btn_question: self.btn_question.draw(screen)
+        if self.img_character1: self.img_character1.draw(screen)
+        if self.img_character2: self.img_character2.draw(screen)
 
     def exit(self):
         pass

@@ -52,9 +52,9 @@ def save_player_data():
     
     if game and hasattr(game, 'current_player_slot') and game.current_player_slot:
         if game.save_game():
-            print(f"✓ บันทึกข้อมูล Player {game.current_player_slot} สำเร็จ")
+            print(f"Save Player {game.current_player_slot} Successfully")
         else:
-            print("✗ บันทึกข้อมูลไม่สำเร็จ")
+            print("Save Player Fail")
 
 
 def main():
@@ -65,15 +65,27 @@ def main():
     
     # รันเกม
     try:
+        print("=" * 50)
+        print("Gacha Legends - Game Starting...")
+        print("=" * 50) 
+
         game.run()
+
     except KeyboardInterrupt:
-        print("\nกำลังปิดเกม...")
+        print("\nGame closed. Thank you for playing!\n")
+
     except Exception as e:
-        print(f"เกิดข้อผิดพลาด: {e}")
+        print("\n" + "=" * 50)
+        print("ERROR: An unexpected error occurred!")
+        print("=" * 50)
+        print(f"Error Type: {type(e).__name__}")
+        print(f"Error Message: {str(e)}")
+        print("\nPlease report this error if it persists.")
+
     finally:
         # บันทึกข้อมูลก่อนปิด
         save_player_data()
-        print("ปิดเกมแล้ว")
+        print("\nGame closed. Thank you for playing!\n")
 
 
 # เริ่มเกมเมื่อรันไฟล์นี้

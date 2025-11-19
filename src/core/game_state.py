@@ -1,9 +1,12 @@
 from abc import ABC, abstractmethod
 import pygame
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from src.core.game import Game
 
 class GameState(ABC):
-    def __init__(self, game):
+    def __init__(self, game: 'Game'):
         self.game = game
         self.assets = None
     
