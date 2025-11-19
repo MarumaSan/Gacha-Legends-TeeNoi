@@ -19,7 +19,7 @@ ENV/
 # OS
 .DS_Store
 Thumbs.db
-**/.DS_Store
+**/.DS_Storeß
 
 # Game Data (optional - uncomment if you don't want to track save files)
 # data/json/save_data_player*.json

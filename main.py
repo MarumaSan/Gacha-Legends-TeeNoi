@@ -65,29 +65,29 @@ def main():
 
     game.run()
     
-    # รันเกม
-    # try:
-    #     print("=" * 50)
-    #     print("Gacha Legends - Game Starting...")
-    #     print("=" * 50) 
+    รันเกม
+    try:
+        print("=" * 50)
+        print("Gacha Legends - Game Starting...")
+        print("=" * 50) 
 
-    #     game.run()
+        game.run()
 
-    # except KeyboardInterrupt:
-    #     print("\nGame closed. Thank you for playing!\n")
+    except KeyboardInterrupt:
+        print("\nGame closed. Thank you for playing!\n")
 
-    # except Exception as e:
-    #     print("\n" + "=" * 50)
-    #     print("ERROR: An unexpected error occurred!")
-    #     print("=" * 50)
-    #     print(f"Error Type: {type(e).__name__}")
-    #     print(f"Error Message: {str(e)}")
-    #     print("\nPlease report this error if it persists.")
+    except Exception as e:
+        print("\n" + "=" * 50)
+        print("ERROR: An unexpected error occurred!")
+        print("=" * 50)
+        print(f"Error Type: {type(e).__name__}")
+        print(f"Error Message: {str(e)}")
+        print("\nPlease report this error if it persists.")
 
-    # finally:
-    #     # บันทึกข้อมูลก่อนปิด
-    #     save_player_data()
-    #     print("\nGame closed. Thank you for playing!\n")
+    finally:
+        # บันทึกข้อมูลก่อนปิด
+        save_player_data()
+        print("\nGame closed. Thank you for playing!\n")
 
 
 # เริ่มเกมเมื่อรันไฟล์นี้
