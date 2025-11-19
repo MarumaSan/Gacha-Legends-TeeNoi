@@ -42,9 +42,10 @@ class SettingsState(GameState):
     def enter(self):
         """เรียกเมื่อเข้าสู่หน้านี้ - โหลดรูปภาพและสร้าง UI"""
         # โหลดพื้นหลัง town_2
+        self.dragging = False
+
         try:
-            self.background = assets.load_image('assets/backgrounds/town_2.png', 
-                                                     (SCREEN_WIDTH, SCREEN_HEIGHT))
+            self.background = assets.load_image('assets/backgrounds/town_2.png',(SCREEN_WIDTH, SCREEN_HEIGHT))
         except Exception as e:
             print(f"Warning: Could not load background: {e}")
             # สร้างพื้นหลังสำรอง
@@ -53,33 +54,42 @@ class SettingsState(GameState):
         
         # Load fonts
         try:
-            self.font_title = assets.load_font('assets/fonts/Monocraft.ttf', 48)
+            self.font_title = assets.load_font('assets/fonts/Monocraft.ttf', 60)
             self.font_normal = assets.load_font('assets/fonts/Monocraft.ttf', 24)
             self.font_small = assets.load_font('assets/fonts/Monocraft.ttf', 20)
+            self.slider_bar = assets.load_image('assets/ui/slider_bar.png').convert_alpha()
+            self.slider_button = assets.load_image('assets/ui/slider_button.png').convert_alpha()
         except Exception as e:
             print(f"Warning: Could not load font: {e}")
 
         # ตำแหน่งและขนาด
         center_x = SCREEN_WIDTH // 2
-        start_y = 250
+        center_y = SCREEN_HEIGHT // 2
         
         # ดึงค่า volume เริ่มต้น (ถ้ามี player_data)
         initial_volume = 50  # ค่าเริ่มต้น
         if hasattr(self.game, 'player_data') and self.game.player_data:
             initial_volume = self.game.player_data['settings'].get('volume', 50)
-        
-        # Sound slider (แถบปรับเสียง - เล็กลง)
-        self.sound_slider = Slider(
-            x=center_x - 100,
-            y=start_y,
-            width=200,
-            height=15,
-            min_value=0,
-            max_value=100,
-            initial_value=initial_volume,
-            callback=self.on_sound_change,
-            label="Volume:",
-            font=self.font_small
+        self.on_sound_change(initial_volume)
+            
+        self.sliderButton_min_cap = 615
+        self.sliderButton_max_cap = 730
+        self.sliderButton_cap = self.sliderButton_max_cap - self.sliderButton_min_cap
+
+        self.sliderButton_y = 350
+
+        self.sound_slider = _ImageButton(
+            self.slider_bar,
+            center=(center_x, 350),
+            scale=0.8,
+            use_mask=True,
+        )
+
+        self.sound_slider_button = _ImageButton(
+            self.slider_button,
+            center=(self.sliderButton_min_cap, self.sliderButton_y),
+            scale=0.8,
+            use_mask=True
         )
         
         # โหลดรูปปุ่ม (ใช้รูปเดียวกับหน้าแรก)
@@ -87,6 +97,7 @@ class SettingsState(GameState):
             button_img = assets.load_image('assets/ui/12.png').convert_alpha()
             button_save = assets.load_image('assets/ui/save_button.png').convert_alpha()
             button_logout = assets.load_image('assets/ui/logout.png').convert_alpha()
+
         except Exception as e:
             print(f"Warning: Could not load button image: {e}")
             button_img = pygame.Surface((220, 70), pygame.SRCALPHA)
@@ -94,7 +105,7 @@ class SettingsState(GameState):
             pygame.draw.rect(button_img, (255, 255, 255, 40), button_img.get_rect(), border_radius=16)
         
         # ปุ่ม LOGOUT (ใต้แถบเสียง)
-        logout_y = SCREEN_HEIGHT - 60
+        logout_y = 660
         self.logout_button = _ImageButton(
             button_logout,
             center=(center_x, logout_y),
@@ -104,7 +115,7 @@ class SettingsState(GameState):
         )
         
         # ปุ่ม SAVE (วางไว้ล่างสุด ใช้ _ImageButton เหมือนหน้าแรก)
-        button_center_y = start_y + 100  # วางล่างสุด
+        button_center_y = 450  # วางล่างสุด
         self.save_button = _ImageButton(
             button_save,
             center=(center_x, button_center_y),
@@ -136,8 +147,27 @@ class SettingsState(GameState):
                 pygame.mixer.music.set_volume(volume)
             except:
                 pass
+    
+    def on_sound_event(self, event):
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if self.sound_slider_button.rect.collidepoint(event.pos):
+                self.dragging = True
+
+        if event.type == pygame.MOUSEBUTTONUP:
+            self.dragging = False
+
+        if event.type == pygame.MOUSEMOTION and self.dragging:
+            mouse_x, _ = event.pos
+
+            new_x = mouse_x - self.sound_slider_button.rect.width // 2
+
+            new_x = max(self.sliderButton_min_cap, min(new_x, self.sliderButton_max_cap))
+            slider_value = round((new_x - self.sliderButton_min_cap) / (self.sliderButton_cap), 2) * 100
+
+            self.on_sound_change(slider_value)
         
-        print(f"Volume adjusted to: {int(value)}%")
+        self.sound_slider_button.rect.x = ((self.game.player_data['settings']['volume'] / 100) * self.sliderButton_cap) + self.sliderButton_min_cap
+
     
     def on_logout_click(self):
         """เมื่อกดปุ่ม LOGOUT - บันทึกและกลับไปหน้า loading"""
@@ -188,6 +218,8 @@ class SettingsState(GameState):
             self.logout_button.handle_event(event)
         if self.save_button:
             self.save_button.handle_event(event)
+        if self.on_sound_event:
+            self.on_sound_event(event)
     
     def update(self, dt):
         """
@@ -197,8 +229,8 @@ class SettingsState(GameState):
             dt: Delta time in seconds since last update
         """
         # อัปเดต UI
-        if self.sound_slider:
-            self.sound_slider.update()
+        # if self.sound_slider:
+        #     self.sound_slider.update()
         if self.logout_button:
             self.logout_button.update(dt)
         if self.save_button:
@@ -224,12 +256,14 @@ class SettingsState(GameState):
         # วาดหัวข้อ SETTING
         if self.font_title:
             title_surface = self.font_title.render("SETTING", True, (255, 255, 255))
-            title_rect = title_surface.get_rect(center=(SCREEN_WIDTH // 2, 150))
+            title_rect = title_surface.get_rect(center=(SCREEN_WIDTH // 2, 200))
             screen.blit(title_surface, title_rect)
         
         # วาด UI (แถบปรับเสียง, ปุ่ม LOGOUT และปุ่ม SAVE)
         if self.sound_slider:
             self.sound_slider.draw(screen)
+        if self.sound_slider_button:
+            self.sound_slider_button.draw(screen)
         if self.logout_button:
             self.logout_button.draw(screen)
         if self.save_button:

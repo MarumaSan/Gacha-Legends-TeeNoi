@@ -120,9 +120,8 @@ class Game:
             self.state_manager.add_state('mystic_chest', MysticChestState(self, self.player_data))
             self.state_manager.add_state('celestial_chest', CelestialChestState(self, self.player_data))
             
-            print("อัปเดต player states สำเร็จ")
         except Exception as e:
-            print(f"เกิดข้อผิดพลาดในการอัปเดต states: {e}")
+            print(f"Error states: {e}")
 
     def run(self):
         self.running = True
