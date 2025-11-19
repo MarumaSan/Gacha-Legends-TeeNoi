@@ -166,8 +166,9 @@ class SettingsState(GameState):
             slider_value = round((new_x - self.sliderButton_min_cap) / (self.sliderButton_cap), 2) * 100
 
             self.on_sound_change(slider_value)
-        
-        self.sound_slider_button.rect.x = ((self.game.player_data['settings']['volume'] / 100) * self.sliderButton_cap) + self.sliderButton_min_cap
+            
+        self.sound_volume = (self.game.player_data['settings']['volume'] / 100)
+        self.sound_slider_button.rect.x = (self.sound_volume * self.sliderButton_cap) + self.sliderButton_min_cap
 
     
     def on_logout_click(self):
