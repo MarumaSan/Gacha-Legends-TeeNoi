@@ -20,9 +20,9 @@ TOTAL_HEROES = 21      # จำนวนฮีโร่ทั้งหมด
 # ราคาสุ่ม
 SUMMON_COSTS = {
     'mystic_x1': 100,
-    'mystic_x10': 900,
+    'mystic_x10': 1000,
     'celestial_x1': 150,
-    'celestial_x10': 1350
+    'celestial_x10': 1500
 }
 
 # อัตราความหายาก

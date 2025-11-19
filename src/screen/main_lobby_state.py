@@ -9,11 +9,14 @@ from src.utils import assets
 from src.data.hero_data import get_hero
 from src.core.config import SCREEN_WIDTH, SCREEN_HEIGHT, COLOR_GOLD
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from src.core.game import Game
 
 class MainLobbyState(GameState):
     """Main lobby screen with navigation to Profile, Box, Book, Settings, and Exit"""
     
-    def __init__(self, game, player_data):
+    def __init__(self, game: 'Game', player_data):
         """
         Initialize the main lobby state
         
@@ -61,12 +64,12 @@ class MainLobbyState(GameState):
         
         # โหลดฟอนต์
         try:
-            self.font_large = assets.load_font('assets/fonts/Monocraft.ttf', 32)
-            self.font_normal = assets.load_font('assets/fonts/Monocraft.ttf', 24)
+            self.font_large = assets.load_font('assets/fonts/Monocraft.ttf', 25)
+            self.font_normal = assets.load_font('assets/fonts/Monocraft.ttf', 18)
         except Exception as e:
             print(f"Warning: Could not load font: {e}")
-            self.font_large = pygame.font.Font(None, 32)
-            self.font_normal = pygame.font.Font(None, 24)
+            self.font_large = pygame.font.Font(None, 25)
+            self.font_normal = pygame.font.Font(None, 18)
         
         # โหลดกรอบ profile (ขนาดต้นฉบับ)
         try:
@@ -308,24 +311,19 @@ class MainLobbyState(GameState):
     def on_box_click(self, chest_type='mystic'):
         """เมื่อกดปุ่ม Chest - ไปหน้าสุ่มตามประเภท"""
         if chest_type == 'mystic':
-            print("Mystic Chest clicked - navigating to Mystic Chest")
             self.game.change_state('mystic_chest')
         elif chest_type == 'celestial':
-            print("Celestial Chest clicked - navigating to Celestial Chest")
             self.game.change_state('celestial_chest')
         else:
-            print(f"{chest_type.capitalize()} Chest clicked - navigating to Gacha")
             self.game.selected_chest_type = chest_type
             self.game.change_state('gacha')
     
     def on_book_click(self):
         """เมื่อกดปุ่ม Collection - ไปหน้า Book"""
-        print("Book button clicked - navigating to Book")
         self.game.change_state('book')
     
     def on_settings_click(self):
         """เมื่อกดปุ่ม Settings - ไปหน้า Settings"""
-        print("Settings button clicked - navigating to Settings")
         self.game.previous_state = 'main_lobby'
         self.game.change_state('settings')
     
@@ -351,14 +349,12 @@ class MainLobbyState(GameState):
             mouse_pos = event.pos
             if self.profile_image_rect and self.profile_image_rect.collidepoint(mouse_pos):
                 # คลิก profile - ไปหน้า profile
-                print("Profile clicked - navigating to Profile")
                 self.game.change_state('profile')
                 return
             
             # จัดการการคลิกปุ่ม add code
             if self.add_code_image_rect and self.add_code_image_rect.collidepoint(mouse_pos):
                 # คลิก add code - ไปหน้า add_code
-                print("Add Code clicked - navigating to Add Code")
                 self.game.previous_state = 'main_lobby'
                 self.game.change_state('add_code')
                 return

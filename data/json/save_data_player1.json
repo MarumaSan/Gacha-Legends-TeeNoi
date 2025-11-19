@@ -1,14 +1,8 @@
 {
-  "coins": 100,
-  "owned_heroes": [
-    7,
-    10,
-    9,
-    4,
-    1
-  ],
+  "coins": 1000,
+  "owned_heroes": [],
   "settings": {
-    "volume": 19.0,
+    "volume": 50,
     "sound_enabled": true
   },
   "rank": 0

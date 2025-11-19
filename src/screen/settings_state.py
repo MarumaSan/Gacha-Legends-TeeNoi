@@ -125,12 +125,13 @@ class SettingsState(GameState):
         )
     
     def on_sound_change(self, value):
-        """
-        Callback for sound slider - adjust game volume
+        # รับเฉพาะค่าในช่วง 0-100
+        try:
+            value = int(value)
+        except (TypeError, ValueError):
+            value = 0
+        value = max(0, min(100, value))
         
-        Args:
-            value: New volume value (0-100)
-        """
         # Update player settings (ถ้ามี player_data)
         if hasattr(self.game, 'player_data') and self.game.player_data:
             self.game.player_data['settings']['volume'] = value
@@ -171,7 +172,6 @@ class SettingsState(GameState):
     
     def on_logout_click(self):
         """เมื่อกดปุ่ม LOGOUT - บันทึกและกลับไปหน้า loading"""
-        print("Logout button clicked - saving and returning to loading")
         # บันทึกการตั้งค่า
         if hasattr(self.game, 'current_player_slot') and self.game.current_player_slot is not None:
             self.game.save_game()
@@ -181,7 +181,6 @@ class SettingsState(GameState):
     
     def on_save_click(self):
         """เมื่อกดปุ่ม SAVE - บันทึกการตั้งค่าและกลับไปหน้าเดิม"""
-        print("Save button clicked - saving settings")
         # บันทึกการตั้งค่า (ถ้ามีผู้เล่นเลือกแล้ว)
         if hasattr(self.game, 'current_player_slot') and self.game.current_player_slot is not None:
             self.game.save_game()

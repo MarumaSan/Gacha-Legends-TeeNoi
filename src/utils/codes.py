@@ -8,14 +8,14 @@ import os
 from pathlib import Path
 
 
-# โค้ดเริ่มต้น
-DEFAULT_CODES = {
-    "WELCOME2024": {"coins": 500, "description": "Welcome bonus"},
-    "HERO100": {"coins": 100, "description": "Starter pack"},
-    "LUCKY777": {"coins": 777, "description": "Lucky bonus"},
-    "GACHA1000": {"coins": 1000, "description": "Premium bonus"},
-    "FREEGEMS": {"coins": 250, "description": "Free gems"}
-}
+# # โค้ดเริ่มต้น
+# DEFAULT_CODES = {
+#     "WELCOME2024": {"coins": 500, "description": "Welcome bonus"},
+#     "HERO100": {"coins": 100, "description": "Starter pack"},
+#     "LUCKY777": {"coins": 777, "description": "Lucky bonus"},
+#     "GACHA1000": {"coins": 1000, "description": "Premium bonus"},
+#     "FREEGEMS": {"coins": 250, "description": "Free gems"}
+# }
 
 
 def load_available_codes():

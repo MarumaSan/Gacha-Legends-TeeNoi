@@ -7,79 +7,11 @@ from src.utils import assets, player
 from src.data.hero_data import get_heroes_by_rarity, get_hero
 from src.ui.animation import CardFlipAnimation
 from src.core.config import SCREEN_WIDTH, SCREEN_HEIGHT, SUMMON_COSTS, ASSET_PATHS
+from src.ui.image_button import _ImageButton
 
-
-def _color_effect(src: pygame.Surface, mul=(230, 230, 230, 255)) -> pygame.Surface:
-    """สร้าง effect สีให้กับรูปภาพ"""
-    img = src.copy()
-    img.fill(mul, special_flags=pygame.BLEND_RGBA_MULT)
-    return img
-
-
-class _ImageButton:
-    """ปุ่มที่ใช้รูปภาพพร้อม hover effect"""
-    def __init__(self, base_img: pygame.Surface, center, on_click=None, scale=1.0, use_mask=True, text="", font=None):
-        if scale != 1.0:
-            w, h = base_img.get_size()
-            base_img = pygame.transform.smoothscale(base_img, (int(w * scale), int(h * scale)))
-
-        self.normal = base_img
-        self.hover = _color_effect(base_img, (230, 240, 245, 255))
-        self.down = _color_effect(base_img, (200, 200, 200, 255))
-
-        self.image = self.normal
-        self.rect = self.image.get_rect(center=center)
-
-        self.on_click = on_click
-        self._held = False
-        self._over = False
-
-        self.use_mask = use_mask
-        self.mask = pygame.mask.from_surface(self.image) if use_mask else None
-
-        self.text = text
-        self.font = font
-        self.text_color = (255, 255, 255)
-
-    def _hit(self, pos):
-        if not self.rect.collidepoint(pos):
-            return False
-        if not self.use_mask:
-            return True
-        lx, ly = pos[0] - self.rect.x, pos[1] - self.rect.y
-        return bool(self.mask.get_at((lx, ly)))
-
-    def handle_event(self, event):
-        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-            if self._hit(event.pos):
-                self._held = True
-        elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
-            if self._held and self._hit(event.pos):
-                if self.on_click:
-                    self.on_click()
-            self._held = False
-
-    def update(self, dt):
-        mpos = pygame.mouse.get_pos()
-        self._over = self._hit(mpos)
-
-        if self._over and self._held:
-            self.image = self.down
-        elif self._over:
-            self.image = self.hover
-        else:
-            self.image = self.normal
-
-    def draw(self, surf):
-        shadow = pygame.Surface(self.rect.size, pygame.SRCALPHA)
-        pygame.draw.ellipse(shadow, (0, 0, 0, 60),
-                            (0, int(self.rect.height * 0.75), self.rect.width, int(self.rect.height * 0.5)))
-        surf.blit(shadow, (self.rect.x, self.rect.y))
-        surf.blit(self.image, self.rect)
-
-        if self.text and self.font:
-            label = self.font.render(self.text, True, self.text_color)
-            surf.blit(label, label.get_rect(center=self.rect.center))
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from src.core.game import Game
 
 
 class MysticChestState(GameState):
@@ -91,7 +23,7 @@ class MysticChestState(GameState):
     STATE_NEW_HERO = "new_hero"  # แสดงฮีโร่ใหม่
     STATE_RESULTS = "results"  # แสดงผลลัพธ์ทั้งหมด
     
-    def __init__(self, game, player_data):
+    def __init__(self, game: 'Game', player_data):
         super().__init__(game)
         self.player_data = player_data
         
@@ -160,7 +92,7 @@ class MysticChestState(GameState):
             self.font_title = assets.load_font('assets/fonts/Monocraft.ttf', 48)
             self.font_large = assets.load_font('assets/fonts/Monocraft.ttf', 32)
             self.font_normal = assets.load_font('assets/fonts/Monocraft.ttf', 20)
-            self.font_small = assets.load_font('assets/fonts/Monocraft.ttf', 15)
+            self.font_small = assets.load_font('assets/fonts/Monocraft.ttf', 12)
         except Exception as e:
             print(f"Warning: Could not load font: {e}")
             self.font_title = pygame.font.Font(None, 48)
@@ -259,9 +191,9 @@ class MysticChestState(GameState):
         
         # สร้างฟอนต์เล็กพิเศษสำหรับปุ่ม
         try:
-            button_font = assets.load_font('assets/fonts/Monocraft.ttf', 12)
+            button_font = assets.load_font('assets/fonts/Monocraft.ttf', 10)
         except:
-            button_font = pygame.font.Font(None, 12)
+            button_font = pygame.font.Font(None, 10)
         
         button_y = SCREEN_HEIGHT - 80
         spacing = 150
@@ -413,12 +345,10 @@ class MysticChestState(GameState):
     
     def on_summon_x1_click(self):
         """สุ่ม 1 ครั้ง"""
-        print("Summon x1 clicked")
         self._perform_summon(1)
     
     def on_summon_x10_click(self):
         """สุ่ม 10 ครั้ง"""
-        print("Summon x10 clicked")
         self._perform_summon(10)
     
     def on_back_click(self):
@@ -427,7 +357,6 @@ class MysticChestState(GameState):
     
     def on_question_click(self):
         """ไปหน้าแสดงข้อมูล Mystic Chest"""
-        print("Question button clicked - going to mystic info")
         self.game.change_state('mystic_info')
     
     def on_summon_again_click(self):

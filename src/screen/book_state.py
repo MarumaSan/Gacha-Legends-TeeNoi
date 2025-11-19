@@ -3,83 +3,14 @@
 import pygame
 from src.core.game_state import GameState
 from src.utils import assets
+from src.ui.image_button import _ImageButton
 
 from src.data.hero_data import get_all_heroes, Character
 from src.core.config import SCREEN_WIDTH, SCREEN_HEIGHT
 
-
-def _color_effect(src: pygame.Surface, mul=(230, 230, 230, 255)) -> pygame.Surface:
-    """สร้าง effect สีให้กับรูปภาพ"""
-    img = src.copy()
-    img.fill(mul, special_flags=pygame.BLEND_RGBA_MULT)
-    return img
-
-
-class _ImageButton:
-    """ปุ่มที่ใช้รูปภาพพร้อม hover effect"""
-    def __init__(self, base_img: pygame.Surface, center, on_click=None, scale=1.0, use_mask=True, text="", font=None):
-        if scale != 1.0:
-            w, h = base_img.get_size()
-            base_img = pygame.transform.smoothscale(base_img, (int(w * scale), int(h * scale)))
-
-        self.normal = base_img
-        self.hover = _color_effect(base_img, (230, 240, 245, 255))
-        self.down = _color_effect(base_img, (200, 200, 200, 255))
-
-        self.image = self.normal
-        self.rect = self.image.get_rect(center=center)
-
-        self.on_click = on_click
-        self._held = False
-        self._over = False
-
-        self.use_mask = use_mask
-        self.mask = pygame.mask.from_surface(self.image) if use_mask else None
-
-        self.text = text
-        self.font = font
-        self.text_color = (255, 255, 255)
-
-    def _hit(self, pos):
-        if not self.rect.collidepoint(pos):
-            return False
-        if not self.use_mask:
-            return True
-        lx, ly = pos[0] - self.rect.x, pos[1] - self.rect.y
-        return bool(self.mask.get_at((lx, ly)))
-
-    def handle_event(self, event):
-        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-            if self._hit(event.pos):
-                self._held = True
-        elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
-            if self._held and self._hit(event.pos):
-                if self.on_click:
-                    self.on_click()
-            self._held = False
-
-    def update(self, dt):
-        mpos = pygame.mouse.get_pos()
-        self._over = self._hit(mpos)
-
-        if self._over and self._held:
-            self.image = self.down
-        elif self._over:
-            self.image = self.hover
-        else:
-            self.image = self.normal
-
-    def draw(self, surf):
-        shadow = pygame.Surface(self.rect.size, pygame.SRCALPHA)
-        pygame.draw.ellipse(shadow, (0, 0, 0, 60),
-                            (0, int(self.rect.height * 0.75), self.rect.width, int(self.rect.height * 0.5)))
-        surf.blit(shadow, (self.rect.x, self.rect.y))
-        surf.blit(self.image, self.rect)
-
-        if self.text and self.font:
-            label = self.font.render(self.text, True, self.text_color)
-            surf.blit(label, label.get_rect(center=self.rect.center))
-
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from src.core.game import Game
 
 class BookState(GameState):
     """หน้า Collection - แสดงตัวละคร 2 ตัวต่อหน้า"""
@@ -88,7 +19,7 @@ class BookState(GameState):
     STATE_LIST = "list"  # แสดงรายการตัวละคร
     STATE_INFO = "info"  # แสดงข้อมูลตัวละคร
     
-    def __init__(self, game, player_data):
+    def __init__(self, game: 'Game', player_data):
         super().__init__(game)
         self.player_data = player_data
         
@@ -110,24 +41,21 @@ class BookState(GameState):
         
         # สถานะและข้อมูลที่เลือก
         self.current_state = self.STATE_LIST
-        self.selected_hero = None  # ตัวละครที่เลือกดู
+        self.selected_hero: Character = None  # ตัวละครที่เลือกดู
         self.hero_rects = []  # rect สำหรับตรวจจับการคลิก
     
     def enter(self):
         """เรียกเมื่อเข้าสู่หน้านี้"""
         # โหลดพื้นหลัง
         try:
-            self.background = assets.load_image('assets/backgrounds/book.png', 
-                                                     (SCREEN_WIDTH, SCREEN_HEIGHT))
+            self.background = assets.load_image('assets/backgrounds/book.png', (SCREEN_WIDTH, SCREEN_HEIGHT))
         except Exception as e:
             print(f"Warning: Could not load background: {e}")
-            self.background = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
-            self.background.fill((245, 222, 179))
         
         # โหลดฟอนต์
         try:
-            self.font_title = assets.load_font('assets/fonts/Monocraft.ttf', 32)
-            self.font_normal = assets.load_font('assets/fonts/Monocraft.ttf', 20)
+            self.font_title = assets.load_font('assets/fonts/Monocraft.ttf', 25)
+            self.font_normal = assets.load_font('assets/fonts/Monocraft.ttf', 18)
             self.font_small = assets.load_font('assets/fonts/Monocraft.ttf', 12)
         except Exception as e:
             print(f"Warning: Could not load font: {e}")
@@ -135,26 +63,9 @@ class BookState(GameState):
             self.font_normal = pygame.font.Font(None, 20)
             self.font_small = pygame.font.Font(None, 12)
         
-        # โหลดและเรียงตัวละครทั้งหมด
+        # โหลดและเรียงตัวละครทั้งหมดตาม id (จากน้อยไปมาก)
         all_heroes_raw = get_all_heroes()
-        
-        # แยกตัวละครที่มีและไม่มี
-        owned = []
-        not_owned = []
-        
-        for hero in all_heroes_raw:
-            if hero.id in self.player_data['owned_heroes']:
-                owned.append(hero)
-            else:
-                not_owned.append(hero)
-        
-        # เรียงตาม rarity (EXTREME > LEGENDARY > EPIC > RARE)
-        rarity_order = {'extreme': 4, 'legendary': 3, 'epic': 2, 'rare': 1}
-        owned.sort(key=lambda h: rarity_order.get(h.rarity.lower(), 0), reverse=True)
-        not_owned.sort(key=lambda h: rarity_order.get(h.rarity.lower(), 0), reverse=True)
-        
-        # รวมกัน: ที่มีก่อน แล้วตามด้วยที่ไม่มี
-        self.all_heroes = owned + not_owned
+        self.all_heroes = sorted(all_heroes_raw, key=lambda hero: hero.id)
         
         # โหลดรูปปุ่ม
         try:
@@ -193,7 +104,7 @@ class BookState(GameState):
             lobby_img,
             center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT - 60),
             on_click=self.on_back_click,
-            scale=1.2,
+            scale=1.5,
             use_mask=True,
             text="RETURN TO LOBBY",
             font=self.font_small
@@ -284,7 +195,7 @@ class BookState(GameState):
         elif self.current_state == self.STATE_INFO:
             self._draw_info(screen)
     
-    def _draw_list(self, screen):
+    def _draw_list(self, screen: pygame.Surface):
         """วาดหน้ารายการตัวละคร"""
         # คำนวณตัวละครที่จะแสดงในหน้านี้
         start_idx = self.current_page * self.heroes_per_page
@@ -310,7 +221,7 @@ class BookState(GameState):
             # โหลดและแสดงรูปตัวละคร
             try:
                 portrait = assets.load_image(hero.portrait_path)
-                # ปรับขนาดให้พอดี (ความสูงไม่เกิน 300px)
+                
                 original_width = portrait.get_width()
                 original_height = portrait.get_height()
                 max_height = 300
@@ -319,7 +230,7 @@ class BookState(GameState):
                 new_height = int(original_height * scale)
                 portrait_scaled = pygame.transform.smoothscale(portrait, (new_width, new_height))
                 
-                # ถ้ายังไม่มี - แปลงเป็นขาวดำ (รักษา alpha channel)
+                # ถ้ายังไม่มี - แปลงเป็นขาวดำ
                 if not is_owned:
                     # แปลงเป็น grayscale โดยรักษาความโปร่งใส
                     grayscale = pygame.Surface(portrait_scaled.get_size(), pygame.SRCALPHA)
@@ -332,27 +243,33 @@ class BookState(GameState):
                 
                 # วาดตรงกลาง
                 portrait_x = x - new_width // 2
-                portrait_y = y - new_height // 2
+                portrait_y = y - new_height // 2 + 20
                 screen.blit(portrait_scaled, (portrait_x, portrait_y))
                 
                 # เก็บ rect สำหรับตรวจจับการคลิก
                 hero_rect = pygame.Rect(portrait_x, portrait_y, new_width, new_height)
                 self.hero_rects.append((hero_rect, hero))
+
             except Exception as e:
                 print(f"Warning: Could not load portrait: {e}")
-                # วาดกรอบสำรอง
-                if is_owned:
-                    pygame.draw.rect(screen, (100, 100, 200), (x - 75, y - 100, 150, 200))
-                else:
-                    pygame.draw.rect(screen, (50, 50, 50), (x - 75, y - 100, 150, 200))
             
-            # แสดงชื่อตัวละคร (ลงมาอีก 15px รวม)
+            hero_name_color = {
+            'rare' :  (18, 97, 160),
+            'epic' : (203, 108, 230),
+            'legendary' : (228, 162, 31),
+            'extreme' : (255,82,82)
+            }
+            # แสดงชื่อตัวละคร
             if self.font_normal:
                 if is_owned:
                     name_text = self.font_normal.render(hero.name, True, (0, 0, 0))
+                    rarity_text = self.font_small.render(f'[{hero.rarity}]', True, hero_name_color[hero.rarity])
                 else:
                     name_text = self.font_normal.render("???", True, (100, 100, 100))
-                screen.blit(name_text, (x - name_text.get_width() // 2, y + 145))
+                    rarity_text = self.font_small.render(f'[???]', True, (100, 100, 100))
+
+                screen.blit(name_text, (x - name_text.get_width() // 2, y - 175))
+                screen.blit(rarity_text, (x - rarity_text.get_width() // 2, y - 155))
         
         # วาดปุ่ม (ในหน้า list)
         if self.left_button:
@@ -362,7 +279,7 @@ class BookState(GameState):
         if self.back_button:
             self.back_button.draw(screen)
     
-    def _draw_info(self, screen):
+    def _draw_info(self, screen: pygame.Surface):
         """วาดหน้าข้อมูลตัวละคร"""
         if not self.selected_hero:
             return
@@ -376,7 +293,7 @@ class BookState(GameState):
         
         try:
             portrait = assets.load_image(hero.portrait_path)
-            # ปรับขนาด
+
             original_width = portrait.get_width()
             original_height = portrait.get_height()
             max_height = 350
@@ -402,38 +319,65 @@ class BookState(GameState):
         except:
             pass
         
-        # ขวา - ข้อมูลตัวละคร (ขยับเข้ามา 125px)
+        # ขวา - ข้อมูลตัวละคร
         right_x = SCREEN_WIDTH * 3 // 4 - 125
         start_y = 200
         line_spacing = 50
+        hero_name_color = {
+            'rare' :  (18, 97, 160),
+            'epic' : (203, 108, 230),
+            'legendary' : (228, 162, 31),
+            'extreme' : (255,82,82)
+        }
         
         if self.font_title:
             # ชื่อ
             if is_owned:
-                name = self.font_title.render(hero.name, True, (0, 0, 0))
+                name = self.font_title.render(hero.name, True, hero_name_color[hero.rarity])
             else:
-                name = self.font_title.render("???", True, (100, 100, 100))
+                name = self.font_title.render("???", True, hero_name_color[hero.rarity])
+                
             screen.blit(name, (right_x - name.get_width() // 2, start_y))
         
         if self.font_normal and is_owned:
             # Rarity
             rarity_text = f"RARITY : {hero.rarity.upper()}"
-            rarity = self.font_normal.render(rarity_text, True, (0, 0, 0))
+            rarity = self.font_normal.render(rarity_text, True, (85,85,85))
             screen.blit(rarity, (right_x - rarity.get_width() // 2, start_y + line_spacing))
             
             # ATK
             atk_text = f"ATK : {hero.atk}"
-            atk = self.font_normal.render(atk_text, True, (0, 0, 0))
+            atk = self.font_normal.render(atk_text, True, (85,85,85))
             screen.blit(atk, (right_x - atk.get_width() // 2, start_y + line_spacing * 2))
             
             # DEF
             def_text = f"DEF : {hero.defense}"
-            def_render = self.font_normal.render(def_text, True, (0, 0, 0))
+            def_render = self.font_normal.render(def_text, True, (85,85,85))
             screen.blit(def_render, (right_x - def_render.get_width() // 2, start_y + line_spacing * 3))
             
             # POWER
             power_text = f"POWER : {hero.totalPower}"
-            power = self.font_normal.render(power_text, True, (0, 0, 0))
+            power = self.font_normal.render(power_text, True, (85,85,85))
+            screen.blit(power, (right_x - power.get_width() // 2, start_y + line_spacing * 4))
+        
+        else:
+            rarity_text = f"RARITY : ???"
+            rarity = self.font_normal.render(rarity_text, True, (85,85,85))
+            screen.blit(rarity, (right_x - rarity.get_width() // 2, start_y + line_spacing))
+            
+            # ATK
+            atk_text = f"ATK : ???"
+            atk = self.font_normal.render(atk_text, True, (85,85,85))
+            screen.blit(atk, (right_x - atk.get_width() // 2, start_y + line_spacing * 2))
+            
+            # DEF
+            def_text = f"DEF : ???"
+            def_render = self.font_normal.render(def_text, True, (85,85,85))
+            screen.blit(def_render, (right_x - def_render.get_width() // 2, start_y + line_spacing * 3))
+            
+            # POWER
+            power_text = f"POWER : ???"
+            power = self.font_normal.render(power_text, True, (85,85,85))
             screen.blit(power, (right_x - power.get_width() // 2, start_y + line_spacing * 4))
         
         # ปุ่ม BACK

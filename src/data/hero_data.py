@@ -250,8 +250,6 @@ CHARACTER: list[Character] = [
         card_front_path='assets/cards/front/hero19.png',
         card_back_path='assets/cards/back/2.PNG',
     ),
-    
-    # EXTREME (2 ตัว)
     Character(
         id=20,
         name='Golden Dragon',

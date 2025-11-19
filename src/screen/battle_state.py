@@ -76,10 +76,10 @@ class BattleState(GameState):
         
         # โหลดฟอนต์
         try:
-            self.font_title = assets.load_font('assets/fonts/Monocraft.ttf', 32)
-            self.font_normal = assets.load_font('assets/fonts/Monocraft.ttf', 20)
-            self.font_large = assets.load_font('assets/fonts/Monocraft.ttf', 48)
-            self.font_small = assets.load_font('assets/fonts/Monocraft.ttf', 15)
+            self.font_title = assets.load_font('assets/fonts/Monocraft.ttf', 25)
+            self.font_normal = assets.load_font('assets/fonts/Monocraft.ttf', 18)
+            self.font_large = assets.load_font('assets/fonts/Monocraft.ttf', 32)
+            self.font_small = assets.load_font('assets/fonts/Monocraft.ttf', 12)
         except:
             self.font_title = pygame.font.Font(None, 32)
             self.font_normal = pygame.font.Font(None, 20)
@@ -120,15 +120,15 @@ class BattleState(GameState):
             self._handle_card_selection(event, 2)
             self._handle_confirm_button(event, 2)
         elif self.phase == "ROUND_COMPARE":
-            # ให้กด Enter เพื่อดูผลรอบนี้
-            if self.compare_finished and event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
+            # คลิกเพื่อดูผลรอบนี้เมื่อ animation จบ
+            if self.compare_finished and event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 self._calculate_round_result()
         elif self.phase == "ROUND_RESULT":
-            # กด Enter เพื่อไปรอบถัดไป
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
+            # คลิกเพื่อไปรอบถัดไป
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 self._next_round_or_finish()
         elif self.phase == "FINAL_RESULT":
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 self._return_to_loading()
     
     def _handle_bet_input(self, event):
@@ -142,9 +142,9 @@ class BattleState(GameState):
                         self.bet_amount = amount
                         self._start_player1_turn()
                     else:
-                        print(f"จำนวนเงินไม่ถูกต้อง (ต้อง 1-{min_coins})")
+                        print(f"Money between (1-{min_coins})")
                 except ValueError:
-                    print("กรุณากรอกตัวเลข")
+                    print("Input int")
             elif event.key == pygame.K_BACKSPACE:
                 self.bet_input = self.bet_input[:-1]
             elif event.unicode.isdigit() and len(self.bet_input) < 6:
@@ -463,7 +463,7 @@ class BattleState(GameState):
         
         # หัวข้อ
         title = self.font_title.render("ENTER BET AMOUNT", True, (255, 255, 255))
-        screen.blit(title, (box.centerx - title.get_width() // 2, box.y + 20))
+        screen.blit(title, (box.centerx - title.get_width() // 2, box.y + 22))
         
         # ช่องกรอก
         input_box = pygame.Rect(box.centerx - 150, box.centery - 20, 300, 50)
@@ -471,7 +471,7 @@ class BattleState(GameState):
         pygame.draw.rect(screen, (255, 255, 255), input_box, 2)
         
         input_text = self.font_normal.render(self.bet_input, True, (255, 255, 255))
-        screen.blit(input_text, (input_box.x + 10, input_box.y + 12))
+        screen.blit(input_text, (input_box.centerx - (input_text.get_width() // 2), input_box.y + 12))
         
         # คำแนะนำ
         min_coins = min(self.player1_data['coins'], self.player2_data['coins'])
@@ -517,8 +517,7 @@ class BattleState(GameState):
                         order_num = card_order.index(hero_id) + 1
                         # แสดงเลขลำดับ (สีขาว, ตัวเล็กลง)
                         order_text = self.font_normal.render(str(order_num), True, (255, 255, 255))
-                        screen.blit(order_text, (rect.centerx - order_text.get_width() // 2, 
-                                                rect.centery - order_text.get_height() // 2))
+                        screen.blit(order_text, (rect.centerx - order_text.get_width() // 2, rect.centery - order_text.get_height() - 100))
                     
                     # แสดงพลัง
                     power_text = self.font_normal.render(str(hero.power), True, (255, 255, 255))
@@ -526,8 +525,8 @@ class BattleState(GameState):
         
         # แสดงข้อความรอ animation
         if not all(self.revealed_cards):
-            hint = self.font_normal.render("Revealing cards...", True, (200, 200, 200))
-            screen.blit(hint, (SCREEN_WIDTH // 2 - hint.get_width() // 2, SCREEN_HEIGHT - 50))
+            hint = self.font_normal.render("Revealing cards...", True, (255, 255, 255))
+            screen.blit(hint, (SCREEN_WIDTH // 2 - hint.get_width() // 2, SCREEN_HEIGHT - 250))
         else:
             # แสดงปุ่ม CONFIRM, CLEAR, BACK
             self._draw_selection_buttons(screen, player_num)
@@ -806,7 +805,7 @@ class BattleState(GameState):
         if self.compare_finished:
             # กระพริบทุก 0.5 วินาที
             if int(self.blink_timer * 2) % 2 == 0:
-                hint = self.font_normal.render("Press ENTER to continue", True, (200, 200, 200))
+                hint = self.font_normal.render("Click to continue", True, (200, 200, 200))
                 screen.blit(hint, (SCREEN_WIDTH // 2 - hint.get_width() // 2, SCREEN_HEIGHT - 50))
     
     def _draw_result_phase(self, screen):
@@ -858,7 +857,7 @@ class BattleState(GameState):
         
         # คำแนะนำ (กระพริบ)
         if int(self.blink_timer * 2) % 2 == 0:
-            hint = self.font_normal.render("Press ENTER to continue", True, (200, 200, 200))
+            hint = self.font_normal.render("Click to continue", True, (200, 200, 200))
             screen.blit(hint, (box.centerx - hint.get_width() // 2, box.bottom - 40))
     
     def _draw_round_compare_phase(self, screen):
@@ -869,7 +868,7 @@ class BattleState(GameState):
         screen.blit(round_surf, (SCREEN_WIDTH // 2 - round_surf.get_width() // 2, 30))
         
         # แสดงคะแนน
-        score_text = f"P1: {self.p1_wins}  -  P2: {self.p2_wins}"
+        score_text = f"P1 : {self.p1_wins}  -  P2: {self.p2_wins}"
         score_surf = self.font_normal.render(score_text, True, (255, 255, 255))
         screen.blit(score_surf, (SCREEN_WIDTH // 2 - score_surf.get_width() // 2, 80))
         
@@ -951,7 +950,7 @@ class BattleState(GameState):
         
         if self.compare_finished:
             if int(self.blink_timer * 2) % 2 == 0:
-                hint = self.font_normal.render("Press ENTER to continue", True, (200, 200, 200))
+                hint = self.font_normal.render("Click to continue", True, (200, 200, 200))
                 screen.blit(hint, (SCREEN_WIDTH // 2 - hint.get_width() // 2, SCREEN_HEIGHT - 50))
     
     def _draw_round_result_phase(self, screen):
@@ -974,7 +973,7 @@ class BattleState(GameState):
             color = (255, 215, 0)
         else:
             winner_text = "DRAW!"
-            color = (200, 200, 200)
+            color = (203, 108, 230)
         
         winner_surf = self.font_large.render(winner_text, True, color)
         screen.blit(winner_surf, (box.centerx - winner_surf.get_width() // 2, box.y + 80))
@@ -984,7 +983,7 @@ class BattleState(GameState):
         screen.blit(score_surf, (box.centerx - score_surf.get_width() // 2, box.y + 150))
         
         if int(self.blink_timer * 2) % 2 == 0:
-            hint = self.font_normal.render("Press ENTER to continue", True, (200, 200, 200))
+            hint = self.font_normal.render("Click to continue", True, (200, 200, 200))
             screen.blit(hint, (box.centerx - hint.get_width() // 2, box.bottom - 40))
     
     def _draw_final_result_phase(self, screen):
@@ -1001,7 +1000,7 @@ class BattleState(GameState):
             color = (255, 215, 0)
         else:
             result_text = "DRAW!"
-            color = (200, 200, 200)
+            color = (203, 108, 230)
         
         result = self.font_large.render(result_text, True, color)
         screen.blit(result, (box.centerx - result.get_width() // 2, box.y + 40))
@@ -1010,13 +1009,13 @@ class BattleState(GameState):
         score_surf = self.font_normal.render(final_score, True, (255, 255, 255))
         screen.blit(score_surf, (box.centerx - score_surf.get_width() // 2, box.y + 100))
         
-        p1_score = self.font_normal.render(f"Player 1 Wins: {self.player1_data['rank']}", True, (255, 255, 255))
-        screen.blit(p1_score, (box.centerx - p1_score.get_width() // 2, box.y + 140))
+        # p1_score = self.font_normal.render(f"Player 1 Wins: {self.player1_data['rank']}", True, (255, 255, 255))
+        # screen.blit(p1_score, (box.centerx - p1_score.get_width() // 2, box.y + 140))
         
-        p2_score = self.font_normal.render(f"Player 2 Wins: {self.player2_data['rank']}", True, (255, 255, 255))
-        screen.blit(p2_score, (box.centerx - p2_score.get_width() // 2, box.y + 170))
+        # p2_score = self.font_normal.render(f"Player 2 Wins: {self.player2_data['rank']}", True, (255, 255, 255))
+        # screen.blit(p2_score, (box.centerx - p2_score.get_width() // 2, box.y + 170))
         
-        money_y = box.y + 210
+        money_y = box.centery #box.y + 210
         if self.winner == 1:
             p1_money = self.font_normal.render(f"Player 1: +{self.bet_amount} coins", True, (0, 255, 0))
             p2_money = self.font_normal.render(f"Player 2: -{self.bet_amount} coins", True, (255, 0, 0))
@@ -1031,7 +1030,7 @@ class BattleState(GameState):
         screen.blit(p2_money, (box.centerx - p2_money.get_width() // 2, money_y + 25))
         
         if int(self.blink_timer * 2) % 2 == 0:
-            hint = self.font_normal.render("Press ENTER to continue", True, (150, 150, 150))
+            hint = self.font_normal.render("Click to continue", True, (150, 150, 150))
             screen.blit(hint, (box.centerx - hint.get_width() // 2, box.bottom - 30))
     
     def exit(self):

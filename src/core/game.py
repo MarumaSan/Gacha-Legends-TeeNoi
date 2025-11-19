@@ -52,7 +52,7 @@ class Game:
         self.current_player_slot = player_slot
         
         # โหลดข้อมูลผู้เล่น (เป็น dict)
-        self.player_data: list[player] = player.load_player_data(player_slot)
+        self.player_data: dict[str, any] = player.load_player_data(player_slot)
         
         print(f"Load Player {player_slot} Successfully")
         

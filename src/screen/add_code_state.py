@@ -116,8 +116,6 @@ class AddCodeState(GameState):
         else:
             self.player_slot = 1
         
-        print(f"Add Code State for Player {self.player_slot}")
-        
         # โหลดพื้นหลัง summon_2.png
         try:
             self.background = assets.load_image('assets/backgrounds/summon_2.png', 
@@ -129,10 +127,10 @@ class AddCodeState(GameState):
         
         # โหลดฟอนต์
         try:
-            self.font_title = assets.load_font('assets/fonts/Monocraft.ttf', 32)
-            self.font_large = assets.load_font('assets/fonts/Monocraft.ttf', 32)  # สำหรับแสดงรางวัล (ลดจาก 48)
+            self.font_title = assets.load_font('assets/fonts/Monocraft.ttf', 60)
+            self.font_large = assets.load_font('assets/fonts/Monocraft.ttf', 32)  # สำหรับแสดงรางวัล
             self.font_normal = assets.load_font('assets/fonts/Monocraft.ttf', 20)
-            self.font_small = assets.load_font('assets/fonts/Monocraft.ttf', 15)
+            self.font_small = assets.load_font('assets/fonts/Monocraft.ttf', 12)
         except Exception as e:
             print(f"Warning: Could not load font: {e}")
             self.font_title = pygame.font.Font(None, 32)
@@ -196,9 +194,7 @@ class AddCodeState(GameState):
             self.show_message("Please enter a code!", (255, 100, 100))
             return
         
-        print(f"Attempting to redeem code: '{self.code_text}'")
         success, message, coins = codes.redeem_code(self.code_text, self.player_slot)
-        print(f"Result: success={success}, message='{message}', coins={coins}")
         
         if success:
             # โค้ดถูกต้อง - เพิ่มเหรียญให้ผู้เล่น
@@ -219,7 +215,6 @@ class AddCodeState(GameState):
     
     def on_back_click(self):
         """เมื่อกดปุ่ม RETURN TO LOBBY - กลับไปหน้าล็อบบี้"""
-        print("Return to lobby clicked")
         self.game.change_state('main_lobby')
     
     def show_message(self, text, color=(255, 255, 255)):
@@ -305,7 +300,7 @@ class AddCodeState(GameState):
                 # วาดข้อความขนาดใหญ่ตรงกลางจอ
                 msg_surface = self.font_large.render(self.message, True, self.message_color)
                 msg_surface.set_alpha(alpha)
-                msg_rect = msg_surface.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 100))
+                msg_rect = msg_surface.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 150))
                 
                 screen.blit(msg_surface, msg_rect)
     

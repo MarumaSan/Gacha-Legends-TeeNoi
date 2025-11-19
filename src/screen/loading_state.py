@@ -4,6 +4,7 @@ from src.utils import assets
 from src.core.config import SCREEN_WIDTH, SCREEN_HEIGHT
 from src.ui.image_button import _ImageButton
 from src.ui.text_display import TextDisplay
+from src.utils import player
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -33,7 +34,7 @@ class LoadingState(GameState):
         try:
             self.background = assets.load_image('assets/backgrounds/town_2.png').convert()
         except Exception as e:
-            print(f"โหลดพื้นหลังไม่ได้: {e}")
+            print(f"Cannot load background: {e}")
             self.background = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
             self.background.fill((50, 50, 100))
 
@@ -156,13 +157,22 @@ class LoadingState(GameState):
             self.game.change_state('main_lobby')
 
     def on_battle_click(self):
-        if getattr(self.game.state_manager, "transitioning", False):
-            return
-        print("คลิกปุ่ม BATTLE")
-        if hasattr(self.game, "change_state_then_fade_in"):
-            self.game.change_state_then_fade_in('battle', duration=0.6)
+        player1 = player.load_player_data(1)
+        player2 = player.load_player_data(2)
+        if len(player1['owned_heroes']) <= 5 and len(player2['owned_heroes']) <= 5:
+            print('Players must have 5 characters each.')
+        elif player1['coins'] <= 0 or player2['coins'] <= 0:
+            print('Money 0 cannot play')
         else:
-            self.game.change_state('battle')
+            if getattr(self.game.state_manager, "transitioning", False):
+                return
+            if hasattr(self.game, "change_state_then_fade_in"):
+                self.game.change_state_then_fade_in('battle', duration=0.6)
+            else:
+                self.game.change_state('battle')
+        
+            
+        
     
     # def on_exit_click(self):
     #     if getattr(self.game.state_manager, "transitioning", False):
@@ -173,7 +183,6 @@ class LoadingState(GameState):
     def on_question_click(self):
         if getattr(self.game.state_manager, "transitioning", False):
             return
-        print("คลิกปุ่ม Question - ไปหน้า How to Play")
         self.game.change_state('how_to_play')
 
     def handle_event(self, event):
