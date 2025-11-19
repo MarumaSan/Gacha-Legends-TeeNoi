@@ -19,7 +19,7 @@ def create_player_data():
         'coins': STARTING_COINS,
         'owned_heroes': [],
         'settings': {
-            'volume': 50,
+            'volume': 10,
             'sound_enabled': True
         },
         'rank': 0
