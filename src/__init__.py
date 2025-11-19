@@ -1,1 +1,0 @@
-# Gacha Legends - Main Package
