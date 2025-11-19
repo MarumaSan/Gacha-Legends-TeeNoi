@@ -2,7 +2,7 @@
   "coins": 1000,
   "owned_heroes": [],
   "settings": {
-    "volume": 50,
+    "volume": 0,
     "sound_enabled": true
   },
   "rank": 0
